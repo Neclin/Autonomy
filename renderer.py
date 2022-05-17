@@ -1,9 +1,15 @@
 import pygame
 
+from bezier import Bezier
+
 from level import Level
 from settings import *
 
 class Renderer():
+
+    test = Bezier()
+    test.start(pygame.Vector2(200,200))
+    test.end(pygame.Vector2(400,600),0)
 
     gridCell = pygame.image.load("assets/light/gridCell.png")
 
@@ -20,5 +26,6 @@ class Renderer():
                 x = x * cellSize
                 window.blit(self.gridCell, (offset.x + x, offset.y + y))
 
+        self.test.show(window)
 
         pygame.display.update()
