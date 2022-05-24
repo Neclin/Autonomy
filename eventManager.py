@@ -5,6 +5,7 @@ from placer import Placer
 class EventManager():
     running = True
     start = True
+    mouseDown = False
 
     @classmethod
     def checkEvents(self):
@@ -25,12 +26,8 @@ class EventManager():
             
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    pos = event.pos
-                    Placer.mouseDown = True
-                    Placer.startPos = pygame.Vector2(pos[0], pos[1])
+                    self.mouseDown = True
             
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
-                    Placer.convayer(Placer, event.pos)
-                    Placer.mouseDown = False
-                    Placer.startPos = None
+                    self.mouseDown = False
