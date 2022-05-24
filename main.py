@@ -19,9 +19,9 @@ path = Path()
 
 items = []
 
-for i in range(10):
+for i in range(50):
     temp = path.head
-    for j in range(i*2):
+    for j in range(i):
         temp = temp.next
     items.append(Item(temp))
 
@@ -43,5 +43,5 @@ while EventManager.running:
         for item in items:
             item.moveForwards(deltaTime)
             item.show(window)
-        path.show(window)
+        #path.show(window)
         pygame.display.update()

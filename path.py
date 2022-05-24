@@ -4,15 +4,28 @@ from settings import screenHeight, screenWidth
 class Path():
     def __init__(self):
         self.head = None
-        self.last = None
+        self.tail = None
 
-        for y in range(100, screenHeight - 100, 20):
+        gap = 16
+
+        for y in range(100, screenHeight - 100, gap):
             node = Node(pygame.Vector2(100, y))
             self.addNode(node)
 
-        for x in range(100, screenWidth - 100, 20):
+        for x in range(100, screenWidth - 100, gap):
             node = Node(pygame.Vector2(x, screenHeight - 100))
             self.addNode(node)
+        
+        for y in range(screenHeight - 100, 100, -gap):
+            node = Node(pygame.Vector2(screenHeight - 100, y))
+            self.addNode(node)
+
+        for x in range(screenWidth - 100, 100, -gap):
+            node = Node(pygame.Vector2(x, 100))
+            self.addNode(node)
+        
+        self.tail.next = self.head
+        
     
     def addNode(self, node):
         if self.head is None:
@@ -24,12 +37,21 @@ class Path():
 
     def show(self, window):
         self.temp = self.head
-        while self.temp != None:
+        lastPoint = None
+        start = True
+
+        while self.temp != self.head or start:
+            start = False
             point = self.temp.pos
-            pygame.draw.circle(window, (255, 255, 255), (int(point.x), int(point.y)), 1)
-            if self.temp.occupied:
-                pygame.draw.circle(window, (0, 255, 0), (int(point.x), int(point.y)), 1)
+            # if self.temp.occupied:
+            #     pygame.draw.circle(window, (0, 255, 0), (int(point.x), int(point.y)), 2)
+            if lastPoint != None:
+                pygame.draw.line(window, (0,0,0), lastPoint, point)
+            lastPoint = point
             self.temp = self.temp.next
+
+    def free():
+        del(self)
 
 class Node():
     def __init__(self, pos):
