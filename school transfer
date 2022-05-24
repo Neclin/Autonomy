@@ -1,0 +1,65 @@
+import pygame
+import time
+
+pygame.init()
+window = pygame.display.set_mode((800,800))
+
+player = pygame.Vector2(100,100)
+playerVel = 1000
+
+path = [pygame.Vector2(268, 191), pygame.Vector2(537, 231), pygame.Vector2(644, 462), pygame.Vector2(555, 700), pygame.Vector2(317, 684), pygame.Vector2(159, 557), pygame.Vector2(377, 413)]
+pathIndex = 0
+
+def moveToPoint(point):
+    global player
+    global pathIndex
+    direction = point - player
+    if direction.magnitude() > 0:
+        if direction.magnitude() > player.distance_to(point - direction.normalize() * playerVel * deltaTime):
+            player += direction.normalize() * playerVel * deltaTime
+        else:
+            player = pygame.Vector2(point.x, point.y)
+            if pathIndex < len(path) - 1:
+                pathIndex += 1
+    else:
+        player = pygame.Vector2(point.x, point.y)
+        if pathIndex < len(path) - 1:
+            pathIndex += 1
+        else:
+            pathIndex = 0
+
+oldTime = time.time()
+running = True
+while running:
+    newTime = time.time()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+                pygame.quit()
+        
+        if event.type ==pygame.MOUSEBUTTONDOWN:
+            pos = event.pos
+            pos = pygame.Vector2(pos[0],pos[1])
+            path.append(pos)
+        
+    if newTime - oldTime >= 1/60:
+        deltaTime = newTime - oldTime
+        oldTime = newTime  
+        point = path[pathIndex]
+        moveToPoint(point)
+    
+        print(1 / deltaTime)
+        window.fill((51,51,51))
+        lastPoint = None
+        for point in path:
+            pygame.draw.circle(window, (0,255,0), point, 3)
+            if lastPoint != None:
+                pygame.draw.line(window, (0,255,0), lastPoint, point)
+            lastPoint = point
+        pygame.draw.circle(window, (200,100,150), player, 10)
+        pygame.display.update()
