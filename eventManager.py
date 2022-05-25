@@ -1,6 +1,8 @@
 import pygame
 
 from placer import Placer
+from item import Item
+from level import Level
 
 class EventManager():
     running = True
@@ -27,6 +29,9 @@ class EventManager():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     self.mouseDown = True
+                if event.button == 3:
+                    item = Item(Level.paths[len(Level.paths)-1].head)
+                    Level.items.append(item)
             
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
