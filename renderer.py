@@ -38,9 +38,9 @@ class Renderer():
             item.moveForwards(DT)
             item.show(window)
                 
-        for i, point in enumerate(Placer.points):
-            # red = 0 blue = 1
-            pygame.draw.circle(window, (255 * ((i + 1)%2),0,255 * (i%2)), point, 3)
+#        for i, point in enumerate(Placer.points):
+#            # red = 0 blue = 1
+#            pygame.draw.circle(window, (255 * ((i + 1)%2),0,255 * (i%2)), point, 3)
             
         pygame.display.update()
     

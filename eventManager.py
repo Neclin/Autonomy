@@ -25,6 +25,13 @@ class EventManager():
                 if event.key == pygame.K_r:
                     Placer.rotation -= 90
                     Placer.rotation %= 360
+                
+                if event.key == pygame.K_s:
+                    f = open("levels/save.txt","w")
+                    f.write(str(Level.width)+","+str(Level.height)+"\n")
+                    for conveyor in Level.conveyors:
+                        f.write("conveyor "+str(conveyor.x)+" "+str(conveyor.y)+" "+"0 "+str(conveyor.rotation)+"\n")
+                    f.close()
             
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:

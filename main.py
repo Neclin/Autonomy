@@ -15,35 +15,8 @@ window = pygame.display.set_mode((screenWidth, screenHeight), pygame.NOFRAME)
 
 Level.loadLevel("levels/level1.txt", Placer)
 
-path = Path()
 
-gap = 16
 
-for y in range(100, screenHeight - 100, gap):
-    node = Node(pygame.Vector2(100, y))
-    path.addNode(node)
-
-for x in range(100, screenWidth - 100, gap):
-    node = Node(pygame.Vector2(x, screenHeight - 100))
-    path.addNode(node)
-
-for y in range(screenHeight - 100, 100, -gap):
-    node = Node(pygame.Vector2(screenHeight - 100, y))
-    path.addNode(node)
-
-for x in range(screenWidth - 100, 100, -gap):
-    node = Node(pygame.Vector2(x, 100))
-    path.addNode(node)
-
-path.tail.next = path.head
-
-Level.paths.append(path)
-
-for i in range(50):
-    temp = path.head
-    for j in range(i):
-        temp = temp.next
-    Level.items.append(Item(temp))
 
 # temp = path.head
 # items.append(Item(temp))

@@ -2,7 +2,7 @@ import pygame
 
 class Item():
     def __init__(self, currentPoint):
-        self.vel = 250
+        self.vel = 100
         self.currentPoint = currentPoint
         self.currentPoint.occupied = True
         self.pos = pygame.Vector2(currentPoint.pos.x, currentPoint.pos.y)
