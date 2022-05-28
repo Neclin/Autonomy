@@ -7,9 +7,6 @@ from level import Level
 from renderer import Renderer
 from settings import *
 
-from item import Item
-from path import Path, Node
-
 pygame.init()
 window = pygame.display.set_mode((screenWidth, screenHeight), pygame.NOFRAME)
 

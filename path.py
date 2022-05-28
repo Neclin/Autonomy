@@ -1,12 +1,11 @@
 import pygame
-from settings import screenHeight, screenWidth
 
 class Path():
     def __init__(self):
         self.head = None
         self.tail = None
         
-    
+    # adds a node to the end of the path
     def addNode(self, node):
         if self.head is None:
             self.head = node
@@ -14,8 +13,9 @@ class Path():
         else:
             self.tail.next = node
             self.tail = node
-            
-    def addNodeEnd(self, node):
+
+    # adds a node to the beginning of the path            
+    def addNodeStart(self, node):
         if self.head is None:
             self.head = node
             self.tail = node
@@ -23,18 +23,20 @@ class Path():
             node.next = self.head
             self.head = node
 
+    # draws the path
     def show(self, window):
         self.temp = self.head
         lastPoint = None
         start = True
 
-        while self.temp != None and (self.temp.next != self.head or start):
+        # loops throught the path until the end
+        while self.temp != None and (self.temp.next != self.head or start): # checks for loops
             start = False
             point = self.temp.pos
-            # if self.temp.occupied:
-            #     pygame.draw.circle(window, (0, 255, 0), (int(point.x), int(point.y)), 2)
+            # draws a line between neighboring points
             if lastPoint != None:
                 pygame.draw.line(window, (0,0,0), lastPoint, point)
+            # increments last point and the next node
             lastPoint = point
             self.temp = self.temp.next
 
