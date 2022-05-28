@@ -22,7 +22,7 @@ class Renderer():
         return False
 
     @classmethod
-    def update(self, window):
+    def update(self, window, DT):
         window.fill((204,204,204))
 
         self.drawGrid(window)
@@ -30,7 +30,18 @@ class Renderer():
 
         for conveyor in Level.conveyors:
             conveyor.show(Level.offset, window)
-
+        
+        for path in Level.paths:
+            path.show(window)
+        
+        for item in Level.items:
+            item.moveForwards(DT)
+            item.show(window)
+                
+#        for i, point in enumerate(Placer.points):
+#            # red = 0 blue = 1
+#            pygame.draw.circle(window, (255 * ((i + 1)%2),0,255 * (i%2)), point, 3)
+            
         pygame.display.update()
     
     @classmethod

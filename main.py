@@ -8,22 +8,15 @@ from renderer import Renderer
 from settings import *
 
 from item import Item
-from path import Path
+from path import Path, Node
 
 pygame.init()
 window = pygame.display.set_mode((screenWidth, screenHeight), pygame.NOFRAME)
 
-Level.loadLevel("levels/level1.txt")
+Level.loadLevel("levels/level1.txt", Placer)
 
-path = Path()
 
-items = []
 
-for i in range(50):
-    temp = path.head
-    for j in range(i):
-        temp = temp.next
-    items.append(Item(temp))
 
 # temp = path.head
 # items.append(Item(temp))
@@ -39,9 +32,4 @@ while EventManager.running:
         Placer.conveyor()
     if deltaTime > 1/60:
         oldTime = newTime
-        Renderer.update(window)
-        for item in items:
-            item.moveForwards(deltaTime)
-            item.show(window)
-        #path.show(window)
-        pygame.display.update()
+        Renderer.update(window, deltaTime)

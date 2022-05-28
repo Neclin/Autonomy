@@ -2,7 +2,7 @@ import pygame
 
 class Item():
     def __init__(self, currentPoint):
-        self.vel = 250
+        self.vel = 100
         self.currentPoint = currentPoint
         self.currentPoint.occupied = True
         self.pos = pygame.Vector2(currentPoint.pos.x, currentPoint.pos.y)
@@ -18,7 +18,6 @@ class Item():
             temp = self.pos + direction.normalize() * self.vel * DT
             temp = point - temp
             angle2 = temp.angle_to(point)
-            #print(180 - abs(angle1 - angle2))
             if abs(180 - abs(angle1 - angle2)) > 10:
                 self.pos = self.pos + direction.normalize() * self.vel * DT
             # if direction.magnitude() > self.pos.distance_to(point - direction.normalize() * self.vel * DT):

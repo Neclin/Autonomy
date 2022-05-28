@@ -5,26 +5,6 @@ class Path():
     def __init__(self):
         self.head = None
         self.tail = None
-
-        gap = 16
-
-        for y in range(100, screenHeight - 100, gap):
-            node = Node(pygame.Vector2(100, y))
-            self.addNode(node)
-
-        for x in range(100, screenWidth - 100, gap):
-            node = Node(pygame.Vector2(x, screenHeight - 100))
-            self.addNode(node)
-        
-        for y in range(screenHeight - 100, 100, -gap):
-            node = Node(pygame.Vector2(screenHeight - 100, y))
-            self.addNode(node)
-
-        for x in range(screenWidth - 100, 100, -gap):
-            node = Node(pygame.Vector2(x, 100))
-            self.addNode(node)
-        
-        self.tail.next = self.head
         
     
     def addNode(self, node):
@@ -34,13 +14,21 @@ class Path():
         else:
             self.tail.next = node
             self.tail = node
+            
+    def addNodeEnd(self, node):
+        if self.head is None:
+            self.head = node
+            self.tail = node
+        else:
+            node.next = self.head
+            self.head = node
 
     def show(self, window):
         self.temp = self.head
         lastPoint = None
         start = True
 
-        while self.temp != self.head or start:
+        while self.temp != None and (self.temp.next != self.head or start):
             start = False
             point = self.temp.pos
             # if self.temp.occupied:
@@ -50,7 +38,7 @@ class Path():
             lastPoint = point
             self.temp = self.temp.next
 
-    def free():
+    def free(self):
         del(self)
 
 class Node():
