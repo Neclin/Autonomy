@@ -18,15 +18,29 @@ Level.loadLevel("levels/level1.txt", Placer)
 # temp = path.head
 # items.append(Item(temp))
 
+animationFrames = {
+    "belt": 0
+}
+
 oldTime = time.time()
 while EventManager.running:
     newTime = time.time()
     deltaTime = newTime - oldTime
     EventManager.checkEvents()
-    pos = pygame.mouse.get_pos()
-    pos = pygame.Vector2(pos[0], pos[1])
-    if EventManager.mouseDown and Renderer.isPointInGrid(pos):
-        Placer.conveyor()
+    mousePos = pygame.mouse.get_pos()
+    mousePos = pygame.Vector2(mousePos[0], mousePos[1])
+    arrayPos = Placer.getCoord(mousePos.x, mousePos.y)
+
+    if EventManager.leftMouseDown and Renderer.isPointInGrid(mousePos):
+        Placer.belt.place(arrayPos.x, arrayPos.y, 0, Placer.rotation, Placer.getVectorFromAngle(Placer.rotation))
+        
+    if EventManager.rightMouseDown and Renderer.isPointInGrid(mousePos):
+        building = Level.array[int(arrayPos.y)][int(arrayPos.x)]
+        if building != None:
+            building.remove()
+
     if deltaTime > 1/60:
         oldTime = newTime
-        Renderer.update(window, deltaTime)
+        animationFrames["belt"] += 1
+        animationFrames["belt"] %= 8
+        Renderer.update(window, deltaTime, animationFrames)

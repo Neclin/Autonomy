@@ -22,15 +22,17 @@ class Renderer():
         return False
 
     @classmethod # draws all entities of the screen
-    def update(self, window, DT):
+    def update(self, window, DT, animationFrames):
         window.fill((204,204,204)) # fills the background colour
 
         self.drawGrid(window)
         self.drawCursor(window)
 
-        # draws all conveyors
-        for conveyor in Level.conveyors:
-            conveyor.show(Level.offset, window)
+        # draws all belts
+        for belt in Level.belts:
+            belt.show(Level.offset, window, animationFrames["belt"])
+            if belt.next:
+                pygame.draw.line(window, (255,0,0), Placer.getWindowPoint(belt.x, belt.y), Placer.getWindowPoint(belt.next.x, belt.next.y))
         
         # draws all paths
         for path in Level.paths:

@@ -7,7 +7,8 @@ from level import Level
 class EventManager():
     running = True
     start = True
-    mouseDown = False
+    leftMouseDown = False
+    rightMouseDown = False
 
     @classmethod
     def checkEvents(self):
@@ -36,23 +37,26 @@ class EventManager():
                 if event.key == pygame.K_s:
                     f = open("levels/save.txt","w")
                     f.write(str(Level.width)+","+str(Level.height)+"\n")
-                    for conveyor in Level.conveyors:
-                        f.write("conveyor "+str(conveyor.x)+" "+str(conveyor.y)+" "+"0 "+str(conveyor.rotation)+"\n")
+                    for belt in Level.belts:
+                        f.write("belt "+str(belt.x)+" "+str(belt.y)+" "+"0 "+str(belt.rotation)+"\n")
                     f.close()
             
             # checks mouse presses
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                # checks if the left mouse button is pressed and enbalbes the placer function
+                # checks if the left mouse button is pressed and enbables the placer function
                 if event.button == 1:
-                    self.mouseDown = True
+                    self.leftMouseDown = True
 
-                # adds a item to the last placed conveyor - debug function
+                # checks if the right mouse button is pressed and enbables the placer function
                 if event.button == 3:
-                    item = Item(Level.paths[len(Level.paths)-1].head)
-                    Level.items.append(item)
+                    self.rightMouseDown = True
             
             # checks if mouse is released
             elif event.type == pygame.MOUSEBUTTONUP:
-                # checks if the left mouse button is released and disables the placer function
+                # checks if the left mouse button is pressed and disables the placer function
                 if event.button == 1:
-                    self.mouseDown = False
+                    self.leftMouseDown = False
+
+                # checks if the right mouse button is pressed and disables the placer function
+                if event.button == 3:
+                    self.rightMouseDown = False

@@ -9,7 +9,7 @@ class Level():
     height = 0
 
     items = []
-    conveyors = []
+    belts = []
     paths = []
 
     @classmethod # loads the level from a file
@@ -28,6 +28,6 @@ class Level():
             # reads each line and uses the first word to determine what to do
             for line in f:
                 line = line.split(" ")
-                if line[0] == "conveyor":
-                    # adds a conveyor to the level
-                    Placer.conveyor(int(line[1]), int(line[2]), int(line[3]), int(line[4]))
+                if line[0] == "belt":
+                    # adds a belt to the level
+                    Placer.belt.place(int(line[1]), int(line[2]), int(line[3]), int(line[4]))
