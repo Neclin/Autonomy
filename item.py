@@ -1,64 +1,77 @@
+from hashlib import new
+from textwrap import indent
 import pygame
 
+from settings import cellSize, beltPoints
+
 class Item():
-    def __init__(self, currentPoint):
-        self.vel = 100
-        self.currentPoint = currentPoint
-        self.currentPoint.occupied = True
-        self.pos = pygame.Vector2(currentPoint.pos.x, currentPoint.pos.y)
-        self.stepForNextPoint = pygame.Vector2(0, 0)
+    def __init__(self, pos, index):
+        self.pos = pos
+        self.belt = None
+        self.index = index
+
+        self.type = "iron ore"
     
-    def moveForwards(self, DT):
-        # returns if the item is at the end of the path
-        if self.currentPoint == None:
-            return
-        # calculates the direction vector to get to the next point
-        point = self.currentPoint.pos
-        direction = point - self.pos
-
-        # checks to see that the is not touching the point
-        if direction.magnitude() > 0:
-            # calculates the angle from the item to the point before and after motion
-            angle1 = direction.angle_to(point) # angle before
-            tempPos = self.pos + direction.normalize() * self.vel * DT # positon after movement
-            tempDirection = point - tempPos # distance after
-            angle2 = tempDirection.angle_to(point) # angle after
-
-            # checks that the angle is not changing too much
-            if abs(180 - abs(angle1 - angle2)) > 10:
-                self.pos = tempPos # sets the position to the new position
-
-            # the angle changed a lot and means the item overshot the point
-            else:
-                self.nextPoint() # sets next point to correct for overshoot caused by the item moving too fast
-                
-        # calls nextPoint as the item is at the point
+    
+    def moveTowardsPos(self, pos, dt):
+        # calculates the direction vector and returns the new position
+        direction = pos - self.pos
+        if direction.length() != 0:
+            direction = direction.normalize()
+            return self.pos + direction * cellSize * self.belt.vel * dt
         else:
-            self.nextPoint()
-
-    # sets the items next point to the next point in the path
-    def nextPoint(self):
-        # snaps the item to the location of the point to account for rounding errors
-        point = self.currentPoint.pos
-        self.pos = pygame.Vector2(point.x, point.y)
-
-        # checks the item is not at the end of the path
-        if self.currentPoint.next != None:
-            # checks the next point is not occupied
-            if self.currentPoint.next.occupied:
-                return
-            # sets the next point to the next point in the path and changes the occupied state of the current point
-            self.currentPoint.occupied = False
-            self.currentPoint = self.currentPoint.next
-            self.currentPoint.occupied = True
-        # else:
-        #     if self.path.occupied[0]:
-        #         return
-        #     self.path.occupied[self.pathIndex] = False
-        #     self.pathIndex = 0
-        #     self.path.occupied[self.pathIndex] = True
+            return self.pos
 
 
     # draws the item
-    def show(self, screen):
-        pygame.draw.circle(screen, (255, 0, 0), (int(self.pos.x), int(self.pos.y)), 5)
+    def show(self, screen, dt):
+        if self.type == "iron ore":
+            colour = (170, 85, 70)
+        if self.type == "iron bar":
+            colour = (190, 194, 203)
+            
+        pygame.draw.circle(screen, colour, (int(self.pos.x), int(self.pos.y)), 5)
+
+        # TODO fix belts of different speeds overlaping items
+
+        # the item moves from a point to a point on the belt
+        if self.index + 1 < len(self.belt.points):
+            if self.belt.occupied[self.index+1] == None or self.belt.occupied[self.index+1] == self:
+                newPos = self.moveTowardsPos(self.belt.points[self.index+1], dt)
+            else:
+                self.pos = self.belt.points[self.index] 
+                return
+
+            # moves past the point
+            if pygame.Vector2.distance_to(self.pos, self.belt.points[self.index+1]) < pygame.Vector2.distance_to(newPos, self.belt.points[self.index+1]):
+                self.index += 1  
+                self.belt.occupied[self.index] = self
+
+
+            # moves towards the point
+            else:
+                self.belt.occupied[self.index] = None
+                self.belt.occupied[self.index+1] = self
+                self.pos = newPos
+        
+        # the item moves from a point to a point on the next belt
+        else:
+            if self.belt.next and (self.belt.next.occupied[0] == None or self.belt.next.occupied[0] == self):
+                newPos = self.moveTowardsPos(self.belt.next.points[0], dt)
+            else:
+                self.pos = self.belt.points[self.index]    
+                return
+
+            # moves past the point
+            if pygame.Vector2.distance_to(self.pos, self.belt.next.points[0]) < pygame.Vector2.distance_to(newPos, self.belt.next.points[0]):
+                self.index = 0                
+                self.belt = self.belt.next
+    
+                
+
+            # moves towards the point
+            else:
+                self.belt.occupied[self.index] = None
+                self.belt.next.occupied[0] = self
+                self.pos = newPos
+        

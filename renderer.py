@@ -1,6 +1,6 @@
 import pygame
 
-from settings import cellSize
+from settings import cellSize, screenWidth, screenHeight
 from placer import Placer
 from level import Level
 from settings import *
@@ -8,6 +8,8 @@ from settings import *
 class Renderer():
     # loads constant sprites
     gridCellSprite = pygame.image.load("assets/light/gridCell.png")
+    gridCellSprite = pygame.transform.smoothscale(gridCellSprite, (cellSize, cellSize))
+
 
     cursor1X1 = pygame.image.load("assets/cursor1X1.png")
 
@@ -22,17 +24,14 @@ class Renderer():
         return False
 
     @classmethod # draws all entities of the screen
-    def update(self, window, DT, animationFrames):
+    def update(self, window, dt, animationFrames):
         window.fill((204,204,204)) # fills the background colour
 
         self.drawGrid(window)
-        self.drawCursor(window)
 
         # draws all belts
         for belt in Level.belts:
             belt.show(Level.offset, window, animationFrames["belt"])
-            if belt.next:
-                pygame.draw.line(window, (255,0,0), Placer.getWindowPoint(belt.x, belt.y), Placer.getWindowPoint(belt.next.x, belt.next.y))
         
         # draws all paths
         for path in Level.paths:
@@ -40,13 +39,18 @@ class Renderer():
         
         # draws all items
         for item in Level.items:
-            item.moveForwards(DT)
-            item.show(window)
+            item.show(window, dt)
+
+        # draw the buttons
+        for button in Level.buttons:
+            button.show(window)
                 
         # for i, point in enumerate(Placer.points):
         #     # red = 0 blue = 1
         #     pygame.draw.circle(window, (255 * ((i + 1)%2),0,255 * (i%2)), point, 3)
             
+        self.drawCursor(window)
+        
         pygame.display.update()
     
     @classmethod # draws the grid
@@ -70,6 +74,7 @@ class Renderer():
             mousePos = self.mapToGrid(mousePos.x, mousePos.y)
             # reloads and rotates the cursor sprite
             self.cursor1X1 = pygame.image.load("assets/cursor1X1.png")
+            self.cursor1X1 = pygame.transform.smoothscale(self.cursor1X1, (cellSize*3, cellSize))
             self.cursor1X1 = pygame.transform.rotate(self.cursor1X1, Placer.rotation)
 
             # positons the cursor depending on the rotaion

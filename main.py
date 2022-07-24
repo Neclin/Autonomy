@@ -27,17 +27,6 @@ while EventManager.running:
     newTime = time.time()
     deltaTime = newTime - oldTime
     EventManager.checkEvents()
-    mousePos = pygame.mouse.get_pos()
-    mousePos = pygame.Vector2(mousePos[0], mousePos[1])
-    arrayPos = Placer.getCoord(mousePos.x, mousePos.y)
-
-    if EventManager.leftMouseDown and Renderer.isPointInGrid(mousePos):
-        Placer.belt.place(arrayPos.x, arrayPos.y, 0, Placer.rotation, Placer.getVectorFromAngle(Placer.rotation))
-        
-    if EventManager.rightMouseDown and Renderer.isPointInGrid(mousePos):
-        building = Level.array[int(arrayPos.y)][int(arrayPos.x)]
-        if building != None:
-            building.remove()
 
     if deltaTime > 1/60:
         oldTime = newTime

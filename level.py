@@ -1,6 +1,7 @@
 import pygame
 
 from settings import screenHeight, screenWidth, cellSize
+from button import Button
 
 class Level():
 
@@ -8,9 +9,14 @@ class Level():
     width = 0
     height = 0
 
+    offset = None
+
     items = []
     belts = []
     paths = []
+
+    buttons = []
+    buttonList = ["belt", "forge"]
 
     @classmethod # loads the level from a file
     def loadLevel(self, directory, Placer):
@@ -24,6 +30,12 @@ class Level():
 
             # create an empty array
             self.array = [[None for x in range(self.width)] for y in range(self.height)]
+
+            # creates the buttons for the level
+            for index in range(len(self.buttonList)):
+                offset = (screenWidth - 100 * len(self.buttonList)) // 2
+                button = Button(pygame.Vector2(offset + 100 * index, screenHeight-100), self.buttonList[index])
+                self.buttons.append(button)
 
             # reads each line and uses the first word to determine what to do
             for line in f:

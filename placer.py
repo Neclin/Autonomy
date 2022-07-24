@@ -2,8 +2,8 @@ import pygame
 import math
 
 from level import Level
-from path import Path, Node
 from belt import Belt
+from forge import Forge
 from settings import cellSize
 
 class Placer():
@@ -15,6 +15,8 @@ class Placer():
     points = []
 
     belt = Belt(0,0,0,0)
+    forge = Forge
+    active = belt
 
     @classmethod # gets the x and y index in the array for a point
     def getCoord(self, x, y): 
