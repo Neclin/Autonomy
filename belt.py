@@ -1,4 +1,5 @@
 import pygame
+import math
 
 from settings import cellSize, beltPoints
 from level import Level
@@ -146,6 +147,64 @@ class Belt():
         if self.next and self.next.points:
             pygame.draw.line(window, (0,0,255), self.points[-1], self.next.points[0])
 
+
+    def setNext(self):
+        nextX = int(self.x + self.directionVector.x)
+        nextY = int(self.y + self.directionVector.y)
+        next = None
+        if 0 <= nextX < Level.width and 0 <= nextY < Level.height:
+            next = Level.array[nextY][nextX]
+
+        # both belts are straight
+        if (isinstance(next,Belt)) and next.directionVector == self.directionVector:
+            self.next = next
+
+        # next belt needs to curve
+        elif (isinstance(next,Belt)) and next.rotation == (self.rotation+360-90)%360:
+            next.type = 2
+            next.rotate(next.rotation+90)
+            next.genPoints(beltPoints)
+            self.next = next
+
+        prevX = int(self.x - self.directionVector.x)
+        prevY = int(self.y - self.directionVector.y)
+        prev = None
+        if 0 <= prevX < Level.width and 0 <= prevY < Level.height:
+            prev = Level.array[prevY][prevX]
+
+        # both belts are straight
+        if (isinstance(prev,Belt)) and prev.directionVector == self.directionVector:
+            prev.next = self
+
+        # prev belt needs to curve
+        elif (isinstance(prev,Belt)) and prev.rotation == (self.rotation+360-90)%360: # left
+            prev.type = 1
+            prev.genPoints(beltPoints)
+            prev.next = self
+
+        elif (isinstance(prev,Belt)) and prev.rotation == (self.rotation+360+90)%360: # right
+            prev.type = 2
+            prev.genPoints(beltPoints)
+            prev.next = self
+
+    
+    def resetNext(self):
+        nextX = int(self.x + self.directionVector.x)
+        nextY = int(self.y + self.directionVector.y)
+        next = None
+        if 0 <= nextX < Level.width and 0 <= nextY < Level.height:
+            next = Level.array[nextY][nextX]
+        if isinstance(next, Belt):
+            next.next = None
+        
+        prevX = int(self.x - self.directionVector.x)
+        prevY = int(self.y - self.directionVector.y)
+        prev = None
+        if 0 <= prevX < Level.width and 0 <= prevY < Level.height:
+            prev = Level.array[prevY][prevX]
+        if isinstance(prev, Belt):
+            prev.next = None
+
     # places the belt
     def place(self, x, y, type, rotation, directionVector, vel):
         x, y = int(x), int(y)
@@ -160,45 +219,19 @@ class Belt():
             Level.array[y][x] = belt
             Level.belts.append(belt)
 
-            # straight belts
-            if type == 0:
-                nextX = int(x + directionVector.x)
-                nextY = int(y + directionVector.y)
-                next = None
-                if 0 <= nextX < Level.width and 0 <= nextY < Level.height:
-                    next = Level.array[nextY][nextX]
-                if (isinstance(next,Belt)) and next.directionVector == directionVector:
-                    belt.next = next
-
-                prevX = int(x - directionVector.x)
-                prevY = int(y - directionVector.y)
-                prev = None
-                if 0 <= prevX < Level.width and 0 <= prevY < Level.height:
-                    prev = Level.array[prevY][prevX]#
-
-                # both belts are straight
-                if (isinstance(prev,Belt)) and prev.directionVector == directionVector:
-                    prev.next = belt
-                # belt needs to curve
-                elif (isinstance(prev,Belt)) and prev.rotation == (belt.rotation+360-90)%360: # left
-                    prev.type = 1
-                    prev.genPoints(beltPoints)
-                    prev.next = belt
-
-                elif (isinstance(prev,Belt)) and prev.rotation == (belt.rotation+360+90)%360: # right
-                    prev.type = 2
-                    prev.genPoints(beltPoints)
-                    prev.next = belt
-
+            belt.setNext()
         
         # overwrites the current belt
         elif (isinstance(building, Belt) and building.rotation != rotation):
             building.rotate(rotation)
+
     
     def rotate(self, rotation):
-        belt = Belt(self.x, self.y, self.type, rotation)
-        self.remove()
-        belt.rotation = rotation
+        self.resetNext()
+        self.rotation = rotation
+        self.directionVector = pygame.Vector2(-math.floor(math.sin(math.radians(rotation-90))), -math.floor(math.cos(math.radians(rotation-90))))
+        self.setNext()
+        self.genPoints(beltPoints)
 
     def remove(self):
         prevX = int(self.x - self.directionVector.x)

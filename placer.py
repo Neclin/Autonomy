@@ -7,6 +7,8 @@ from forge import Forge
 from settings import cellSize
 
 class Placer():
+    
+    mouseDirection = None
 
     rotation = 0
     startPos = None
@@ -15,7 +17,7 @@ class Placer():
     points = []
 
     belt = Belt(0,0,0,0)
-    forge = Forge
+    forge = Forge()
     active = belt
 
     @classmethod # gets the x and y index in the array for a point

@@ -11,5 +11,5 @@ class Forge():
     def show(self, window):
         pygame.draw.rect(window, )
 
-    def place(self):
+    def place(self, x, y, rotation):
         pass

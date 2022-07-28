@@ -39,7 +39,10 @@ class Level():
 
             # reads each line and uses the first word to determine what to do
             for line in f:
+                print(line.split(" "))
                 line = line.split(" ")
                 if line[0] == "belt":
                     # adds a belt to the level
-                    Placer.belt.place(int(line[1]), int(line[2]), int(line[3]), int(line[4]))
+                    directionVector = line[5].split(",")
+                    directionVector = pygame.Vector2(int(directionVector[0]), int(directionVector[1]))
+                    Placer.belt.place(int(line[1]), int(line[2]), int(line[3]), int(line[4]), directionVector, int(line[6]))

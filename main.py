@@ -12,9 +12,6 @@ window = pygame.display.set_mode((screenWidth, screenHeight), pygame.NOFRAME)
 
 Level.loadLevel("levels/level1.txt", Placer)
 
-
-
-
 # temp = path.head
 # items.append(Item(temp))
 
