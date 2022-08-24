@@ -2,53 +2,58 @@ import pygame
 import math
 
 from settings import cellSize, beltPoints
-from level import Level
+from managers.level import Level
 
 class Belt():
-    def __init__(self, x, y, type, rotation):
+    def __init__(self):
         self.vel = 0
 
-        self.x = x
-        self.y = y
-        if Level.offset:
-            self.pos = pygame.Vector2(x * cellSize + Level.offset.x, y * cellSize + Level.offset.y)
-        self.type = type
-        self.rotation = rotation
+        self.x = 0
+        self.y = 0
+        self.pos = None
+        self.beltAngle = None
+
+        self.startDirection = None
+        self.endDirection = None
         
-        self.directionVector = None
         self.next = None
+        self.prev = None
         self.points = []
         self.occupied = [None for i in range(beltPoints)]
 
     def quadraticBezier(self, t, p0, p1, p2):
         return pygame.Vector2((1-t)**2 * p0.x + 2 * (1-t) * t * p1.x + t**2 * p2.x, (1-t)**2 * p0.y + 2 * (1-t) * t * p1.y + t**2 * p2.y)
 
+    # calculates the angle of the belt. -90 left 90 right and -180 straight
+    def calculateBeltAngle(self):
+        self.beltAngle = (self.endDirection.angle_to(self.startDirection)+360)%360-180
+
     # generates the points for items to stored on the belt
-    def genPoints(self, numPoints):
+    def genPoints(self):
         # clear the points
         self.points = []
         self.occupied = [None for i in range(beltPoints)]
 
-        if self.directionVector == None:
+        if self.startDirection == None or self.endDirection == None:
             return
 
         pointY = self.pos.y + cellSize / 2 # calcultes the y coordinate of the middle of the belt
         pointX = self.pos.x + cellSize / 2 # calculates the x cordinate of the middle of the belt
 
         # straight belts
-        if self.type == 0:
+        if self.beltAngle == -180:
 
             # gets the coordinates of the points
-            for index in range(numPoints):
-                gap = cellSize / numPoints # distaces between the points
+            for index in range(beltPoints):
+                gap = cellSize / beltPoints # distaces between the points
                 offset = int((gap / 2) + (index * gap)) # calculates the offset of each point
                 # selects the right axis to place the points
-                if self.directionVector.y == 0.0: # the belt is placed horizontaly
-                    direction = self.directionVector.x / abs(self.directionVector.x)
+                if self.startDirection.y == 0.0: # the belt is placed horizontaly
+                    direction = self.startDirection.x / abs(self.startDirection.x)
                     point = pygame.Vector2(self.pos.x + offset, pointY)
                 
-                if self.directionVector.x == 0.0: # the belt is placed verticaly
-                    direction = self.directionVector.y / abs(self.directionVector.y)
+                if self.startDirection.x == 0.0: # the belt is placed verticaly
+                    direction = self.startDirection.y / abs(self.startDirection.y)
                     point = pygame.Vector2(pointX, self.pos.y + offset)
 
                 # appends it to the list of points stored in the belt
@@ -58,82 +63,83 @@ class Belt():
                     self.points.insert(0, point)
 
         # left belts
-        elif self.type == 1:
+        elif self.beltAngle == -90:
             # selects the right axis to place the points
-            if self.directionVector.y == 0.0: # the belt is placed horizontaly
+            if self.startDirection.y == 0.0: # the belt is placed horizontaly
                 # right
-                if self.directionVector.x == 1:
+                if self.startDirection.x == 1:
                     start = pygame.Vector2(self.pos.x, pointY)
                     anchor = pygame.Vector2(pointX, pointY)
                     end = pygame.Vector2(pointX, self.pos.y)
                 # left
-                elif self.directionVector.x == -1:
+                elif self.startDirection.x == -1:
                     start = pygame.Vector2(self.pos.x+cellSize, pointY)
                     anchor = pygame.Vector2(pointX, pointY)
                     end = pygame.Vector2(pointX, self.pos.y+cellSize)
             
-            if self.directionVector.x == 0.0: # the belt is placed verticaly
+            if self.startDirection.x == 0.0: # the belt is placed verticaly
                 # up
-                if self.directionVector.y == -1:
+                if self.startDirection.y == -1:
                     start = pygame.Vector2(pointX, self.pos.y+cellSize)
                     anchor = pygame.Vector2(pointX, pointY)
                     end = pygame.Vector2(self.pos.x, pointY)
                 # down
-                elif self.directionVector.y == 1:
+                elif self.startDirection.y == 1:
                     start = pygame.Vector2(pointX, self.pos.y)
                     anchor = pygame.Vector2(pointX, pointY)
                     end = pygame.Vector2(self.pos.x+cellSize, pointY)
 
-            for index in range(numPoints):
-                point = self.quadraticBezier((index+0.5)/numPoints, start, anchor, end)
+            for index in range(beltPoints):
+                point = self.quadraticBezier((index+0.5)/beltPoints, start, anchor, end)
                 self.points.append(point)
             
         # right belts
-        elif self.type == 2:
+        elif self.beltAngle == 90:
             # selects the right axis to place the points
-            if self.directionVector.y == 0.0: # the belt is placed horizontaly
+            if self.startDirection.y == 0.0: # the belt is placed horizontaly
                 # right
-                if self.directionVector.x == 1:
+                if self.startDirection.x == 1:
                     start = pygame.Vector2(self.pos.x, pointY)
                     anchor = pygame.Vector2(pointX, pointY)
                     end = pygame.Vector2(pointX, self.pos.y+cellSize)
                 # left
-                elif self.directionVector.x == -1:
+                elif self.startDirection.x == -1:
                     start = pygame.Vector2(self.pos.x+cellSize, pointY)
                     anchor = pygame.Vector2(pointX, pointY)
                     end = pygame.Vector2(pointX, self.pos.y)
             
-            if self.directionVector.x == 0.0: # the belt is placed verticaly
+            if self.startDirection.x == 0.0: # the belt is placed verticaly
                 # up
-                if self.directionVector.y == -1:
+                if self.startDirection.y == -1:
                     start = pygame.Vector2(pointX, self.pos.y+cellSize)
                     anchor = pygame.Vector2(pointX, pointY)
                     end = pygame.Vector2(self.pos.x+cellSize, pointY)
                 # down
-                elif self.directionVector.y == 1:
+                elif self.startDirection.y == 1:
                     start = pygame.Vector2(pointX, self.pos.y)
                     anchor = pygame.Vector2(pointX, pointY)
                     end = pygame.Vector2(self.pos.x, pointY)
             
-            for index in range(numPoints):
-                point = self.quadraticBezier((index+0.5)/numPoints, start, anchor, end)
+            for index in range(beltPoints):
+                point = self.quadraticBezier((index+0.5)/beltPoints, start, anchor, end)
                 self.points.append(point)
 
 
     # draws the belt to the screen
     def show(self, offset, window, animationFrame):
+        print(self.startDirection, self.endDirection)
         # sets the sprite sheet for the type of belt
-        if self.type == 0:
+        if self.beltAngle == -180:
             self.spriteSheet = pygame.image.load("assets/light/belt.png")
-        elif self.type == 1:
+        elif self.beltAngle == -90:
             self.spriteSheet = pygame.image.load("assets/light/beltL.png")
-        elif self.type == 2:
+        elif self.beltAngle == 90:
             self.spriteSheet = pygame.image.load("assets/light/beltR.png")
 
         # updates the sprite
         self.sprite = self.spriteSheet.subsurface(animationFrame * 32, 0, 32, 32)
         self.sprite = pygame.transform.smoothscale(self.sprite, (cellSize, cellSize))
-        self.sprite = pygame.transform.rotate(self.sprite, self.rotation) # rotates the sprite
+        self.sprite = pygame.transform.rotate(self.sprite, self.startDirection.angle_to((1,0))) # rotates the sprite
 
         window.blit(self.sprite, (offset.x + self.x * cellSize, offset.y + self.y * cellSize))
 
@@ -149,81 +155,67 @@ class Belt():
 
 
     def setNext(self):
-        nextX = int(self.x + self.directionVector.x)
-        nextY = int(self.y + self.directionVector.y)
-        next = None
+        nextX = int(self.x + self.endDirection.x)
+        nextY = int(self.y + self.endDirection.y)
         if 0 <= nextX < Level.width and 0 <= nextY < Level.height:
             next = Level.array[nextY][nextX]
+            if isinstance(next, Belt):
+                if not next.prev:
+                    self.next = next
+                    next.prev = self
+                    next.startDirection = self.endDirection
+                    next.update()
 
-        # both belts are straight
-        if (isinstance(next,Belt)) and next.directionVector == self.directionVector:
-            self.next = next
-
-        # next belt needs to curve
-        elif (isinstance(next,Belt)) and next.rotation == (self.rotation+360-90)%360:
-            next.type = 2
-            next.rotate(next.rotation+90)
-            next.genPoints(beltPoints)
-            self.next = next
-
-        prevX = int(self.x - self.directionVector.x)
-        prevY = int(self.y - self.directionVector.y)
-        prev = None
+        
+        prevX = int(self.x - self.startDirection.x)
+        prevY = int(self.y - self.startDirection.y)
         if 0 <= prevX < Level.width and 0 <= prevY < Level.height:
             prev = Level.array[prevY][prevX]
-
-        # both belts are straight
-        if (isinstance(prev,Belt)) and prev.directionVector == self.directionVector:
-            prev.next = self
-
-        # prev belt needs to curve
-        elif (isinstance(prev,Belt)) and prev.rotation == (self.rotation+360-90)%360: # left
-            prev.type = 1
-            prev.genPoints(beltPoints)
-            prev.next = self
-
-        elif (isinstance(prev,Belt)) and prev.rotation == (self.rotation+360+90)%360: # right
-            prev.type = 2
-            prev.genPoints(beltPoints)
-            prev.next = self
+            if isinstance(prev, Belt):
+                if not prev.next:
+                    prev.next = self
+                    self.prev = prev
+                    prev.endDirection = self.startDirection
+                    prev.update()
 
     
     def resetNext(self):
-        nextX = int(self.x + self.directionVector.x)
-        nextY = int(self.y + self.directionVector.y)
-        next = None
-        if 0 <= nextX < Level.width and 0 <= nextY < Level.height:
-            next = Level.array[nextY][nextX]
-        if isinstance(next, Belt):
-            next.next = None
+        if self.next:
+            self.next.prev = None
+            self.next = None
         
-        prevX = int(self.x - self.directionVector.x)
-        prevY = int(self.y - self.directionVector.y)
-        prev = None
-        if 0 <= prevX < Level.width and 0 <= prevY < Level.height:
-            prev = Level.array[prevY][prevX]
-        if isinstance(prev, Belt):
-            prev.next = None
+        if self.prev:
+            self.prev.next = None
+            self.prev = None
+
+    def update(self):
+        self.calculateBeltAngle()
+        self.genPoints()
+        self.setNext()
 
     # places the belt
-    def place(self, x, y, type, rotation, directionVector, vel):
+    def place(self, x, y, startDirection, endDirection, vel):
         x, y = int(x), int(y)
 
         # places the belt if its empty
         building = Level.array[y][x]
-        if (building == None):
-            belt = Belt(x, y, type, rotation)
+        if isinstance(building, Belt):
+            building.remove()
+        if building == None:
+            belt = Belt()
+            # sudo constructor
+            belt.x = x
+            belt.y = y
+            belt.pos = pygame.Vector2(Level.offset.x + x * cellSize, Level.offset.y + y * cellSize)
             belt.vel = vel
-            belt.directionVector = directionVector
-            belt.genPoints(beltPoints) # generates the points for the belt
+            belt.startDirection = startDirection
+            belt.endDirection = endDirection
+            belt.update()
             Level.array[y][x] = belt
             Level.belts.append(belt)
 
-            belt.setNext()
-        
-        # overwrites the current belt
-        elif (isinstance(building, Belt) and building.rotation != rotation):
-            building.rotate(rotation)
+            # belt.setNext()
+            return belt
 
     
     def rotate(self, rotation):
@@ -231,16 +223,10 @@ class Belt():
         self.rotation = rotation
         self.directionVector = pygame.Vector2(-math.floor(math.sin(math.radians(rotation-90))), -math.floor(math.cos(math.radians(rotation-90))))
         self.setNext()
-        self.genPoints(beltPoints)
+        self.genPoints()
 
     def remove(self):
-        prevX = int(self.x - self.directionVector.x)
-        prevY = int(self.y - self.directionVector.y)
-        prev = None
-        if 0 <= prevX < Level.width and 0 <= prevY < Level.height:
-            prev = Level.array[prevY][prevX]
-        if (isinstance(prev,Belt)):
-                prev.next = None
+        self.resetNext()
 
         for item in self.occupied:
             if item:
@@ -250,4 +236,3 @@ class Belt():
         Level.array[self.y][self.x] = None
         Level.belts.remove(self)
         del(self)
-            

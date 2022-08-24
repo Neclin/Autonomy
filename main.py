@@ -1,10 +1,10 @@
 import pygame
 import time
 
-from eventManager import EventManager
-from placer import Placer
-from level import Level
-from renderer import Renderer
+from managers.eventManager import EventManager
+from managers.placer import Placer
+from managers.level import Level
+from managers.renderer import Renderer
 from settings import *
 
 pygame.init()

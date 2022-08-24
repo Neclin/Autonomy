@@ -1,14 +1,14 @@
 import pygame
 import math
 
-from level import Level
-from belt import Belt
-from forge import Forge
+from managers.level import Level
+from buildings.belt import Belt
+from buildings.forge import Forge
 from settings import cellSize
 
 class Placer():
     
-    mouseDirection = None
+    mouseDirection = pygame.Vector2(1,0)
 
     rotation = 0
     startPos = None
@@ -16,9 +16,10 @@ class Placer():
     
     points = []
 
-    belt = Belt(0,0,0,0)
+    belt = Belt()
     forge = Forge()
     active = belt
+    activeBuilding = None
 
     @classmethod # gets the x and y index in the array for a point
     def getCoord(self, x, y): 
@@ -38,6 +39,6 @@ class Placer():
         arrayPoint = self.getCoord(pos.x, pos.y)
         return Level.array[int(arrayPoint.y)][int(arrayPoint.x)]
 
-    @classmethod # returns the array point in that direction
+    @classmethod # returns the direction vector of an angle
     def getVectorFromAngle(self, angle):
-        return pygame.Vector2(-math.floor(math.sin(math.radians(angle-90))), -math.floor(math.cos(math.radians(angle-90))))
+        return pygame.Vector2(round(math.cos(math.radians(angle)),1), -round(math.sin(math.radians(angle)),1))

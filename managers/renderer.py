@@ -1,8 +1,8 @@
 import pygame
 
 from settings import cellSize, screenWidth, screenHeight
-from placer import Placer
-from level import Level
+from managers.placer import Placer
+from managers.level import Level
 from settings import *
 
 class Renderer():

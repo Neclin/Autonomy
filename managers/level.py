@@ -1,7 +1,7 @@
 import pygame
 
 from settings import screenHeight, screenWidth, cellSize
-from button import Button
+from GUI.button import Button
 
 class Level():
 
