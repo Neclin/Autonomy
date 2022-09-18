@@ -31,9 +31,9 @@ class EventManager():
         x = abs((self.lastMousePos.x - mousePos.x) * Placer.mouseDirection.y)
         y = abs((self.lastMousePos.y - mousePos.y) * Placer.mouseDirection.x)
 
-        mouseDirection = (mousePos - self.lastMousePos)
         if x+y >= 1:
-            if mouseDirection != pygame.Vector2(0, 0):
+            if (mousePos - self.lastMousePos) != pygame.Vector2(0, 0):
+                mouseDirection = (mousePos - self.lastMousePos).normalize()
 
                 # cast into cardinal directions
                 if abs(mouseDirection.x) > abs(mouseDirection.y): # prioritises horizontal
@@ -49,11 +49,14 @@ class EventManager():
         
         if self.lastArrayPos != arrayPos:
             self.lastArrayPos = arrayPos
-            if Placer.activeBuilding and mouseDirection != -Placer.activeBuilding.startDirection:
-                Placer.rotation = mouseDirection.angle_to((1,0))
-                Placer.activeBuilding.endDirection = mouseDirection
-                Placer.activeBuilding.resetNext()
-                Placer.activeBuilding.update()
+            if (mousePos - self.lastMousePos) != pygame.Vector2(0, 0):
+                mouseDirection = (mousePos - self.lastMousePos).normalize()
+                if Placer.activeBuilding and (mouseDirection.x != -Placer.activeBuilding.startDirection.x or mouseDirection.y != -Placer.activeBuilding.startDirection.y):
+                    Placer.rotation = mouseDirection.angle_to((1,0))
+                    Placer.activeBuilding.endDirection = mouseDirection
+                    Placer.activeBuilding.resetNext()
+                    Placer.activeBuilding.update()
+        
             Placer.activeBuilding = None
             arrayPosChanged = True
 
@@ -133,12 +136,9 @@ class EventManager():
         if EventManager.leftMouseDown and Renderer.isPointInGrid(mousePos):
             directionVector = Placer.getVectorFromAngle(Placer.rotation)
             if not Placer.activeBuilding:
-                print("place")
                 Placer.activeBuilding = Placer.active.place(arrayPos.x, arrayPos.y, directionVector, directionVector, self.speed) 
             else:
-                if mouseDirectionChanged:
-                    if mouseDirection == -Placer.activeBuilding.startDirection:
-                        return
+                if mouseDirectionChanged and (mouseDirection.x != -Placer.activeBuilding.startDirection.x or mouseDirection.y != -Placer.activeBuilding.startDirection.y):
                     Placer.rotation = mouseDirection.angle_to((1,0))
                     Placer.activeBuilding.endDirection = mouseDirection
                     Placer.activeBuilding.resetNext()

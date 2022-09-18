@@ -127,15 +127,6 @@ class Belt():
 
     # draws the belt to the screen
     def show(self, offset, window, animationFrame):
-        print(self.startDirection, self.endDirection)
-        # sets the sprite sheet for the type of belt
-        if self.beltAngle == -180:
-            self.spriteSheet = pygame.image.load("assets/light/belt.png")
-        elif self.beltAngle == -90:
-            self.spriteSheet = pygame.image.load("assets/light/beltL.png")
-        elif self.beltAngle == 90:
-            self.spriteSheet = pygame.image.load("assets/light/beltR.png")
-
         # updates the sprite
         self.sprite = self.spriteSheet.subsurface(animationFrame * 32, 0, 32, 32)
         self.sprite = pygame.transform.smoothscale(self.sprite, (cellSize, cellSize))
@@ -178,7 +169,6 @@ class Belt():
                     prev.endDirection = self.startDirection
                     prev.update()
 
-    
     def resetNext(self):
         if self.next:
             self.next.prev = None
@@ -188,9 +178,19 @@ class Belt():
             self.prev.next = None
             self.prev = None
 
+    def changeSprite(self):
+        # sets the sprite sheet for the type of belt
+        if self.beltAngle == -180:
+            self.spriteSheet = pygame.image.load("assets/light/belt.png")
+        elif self.beltAngle == -90:
+            self.spriteSheet = pygame.image.load("assets/light/beltL.png")
+        elif self.beltAngle == 90:
+            self.spriteSheet = pygame.image.load("assets/light/beltR.png")
+
     def update(self):
         self.calculateBeltAngle()
         self.genPoints()
+        self.changeSprite()
         self.setNext()
 
     # places the belt
