@@ -94,11 +94,7 @@ class EventManager():
                 
                 # saves the current state of the level - not finaliesed
                 if event.key == pygame.K_s:
-                    f = open("levels/save.txt","w")
-                    f.write(str(Level.width)+","+str(Level.height)+"\n")
-                    for belt in Level.belts:
-                        f.write("belt "+str(belt.x)+" "+str(belt.y)+" "+str(belt.type)+" "+str(belt.rotation)+" "+str(int(belt.directionVector.x))+","+str(int(belt.directionVector.y))+" "+str(belt.vel)+"\n")
-                    f.close()
+                    Level.saveLevel("levels/save.txt")
 
                 if event.key == pygame.K_UP:
                     self.speed += 1

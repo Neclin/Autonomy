@@ -39,10 +39,22 @@ class Level():
 
             # reads each line and uses the first word to determine what to do
             for line in f:
-                print(line.split(" "))
                 line = line.split(" ")
                 if line[0] == "belt":
                     # adds a belt to the level
-                    directionVector = line[5].split(",")
-                    directionVector = pygame.Vector2(int(directionVector[0]), int(directionVector[1]))
-                    Placer.belt.place(int(line[1]), int(line[2]), int(line[3]), int(line[4]), directionVector, int(line[6]))
+                    startDirection = line[3].split(",")
+                    startDirection = pygame.Vector2(int(startDirection[0]), int(startDirection[1]))
+                    endDirection = line[4].split(",")
+                    endDirection = pygame.Vector2(int(endDirection[0]), int(endDirection[1]))
+                    Placer.belt.place(int(line[1]), int(line[2]), startDirection, endDirection, int(line[5]))
+    
+    @classmethod
+    def saveLevel(self, directory):
+        with open(directory, "w") as f:
+            f.write(str(Level.width)+","+str(Level.height)+"\n")
+            for belt in Level.belts:
+                startDirectionStr = str(int(belt.startDirection.x))+","+str(int(belt.startDirection.y))
+                endDirectionStr = str(int(belt.endDirection.x))+","+str(int(belt.endDirection.y))
+                f.write(f"belt {belt.x} {belt.y} {startDirectionStr} {endDirectionStr} {belt.vel}\n")
+
+        print("saved")
