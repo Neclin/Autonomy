@@ -29,4 +29,5 @@ while EventManager.running:
         oldTime = newTime
         animationFrames["belt"] += 1
         animationFrames["belt"] %= 8
+        EventManager.checkScreenMovement(deltaTime)
         Renderer.update(window, deltaTime, animationFrames)

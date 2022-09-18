@@ -10,8 +10,10 @@ class Renderer():
     gridCellSprite = pygame.image.load("assets/light/gridCell.png")
     gridCellSprite = pygame.transform.smoothscale(gridCellSprite, (cellSize, cellSize))
 
-
     cursor1X1 = pygame.image.load("assets/cursor1X1.png")
+
+    screenPos = pygame.Vector2(0, 0)
+    cameraVel = pygame.Vector2(100, 100)
 
     @classmethod # snaps a point to the grid
     def mapToGrid(self, x, y):
@@ -26,6 +28,8 @@ class Renderer():
     @classmethod # draws all entities of the screen
     def update(self, window, dt, animationFrames):
         window.fill((204,204,204)) # fills the background colour
+
+        print(self.screenPos.x, self.screenPos.y)
 
         self.drawGrid(window)
 
@@ -55,32 +59,31 @@ class Renderer():
     
     @classmethod # draws the grid
     def drawGrid(self, window):
+        offsetX = self.screenPos.x % cellSize
+        offsetY = self.screenPos.y % cellSize
         # draw each square of the grid
-        for y in range(0, Level.height):
-            y_ = y * cellSize
-            for x in range(0, Level.width):
-                x_ = x * cellSize
-                window.blit(self.gridCellSprite, (Level.offset.x + x_, Level.offset.y + y_))
+        for y in range(0, screenHeight+cellSize, cellSize):
+            for x in range(0, screenWidth+cellSize, cellSize):
+                window.blit(self.gridCellSprite, (x - offsetX, y - offsetY))
     
     @classmethod # draws the cursor
     def drawCursor(self, window):
         # gets the mouse position and converts it to a vector
         mousePos = pygame.mouse.get_pos()
-        mousePos = pygame.Vector2(mousePos[0], mousePos[1])
+        offsetX = self.screenPos.x % cellSize
+        offsetY = self.screenPos.y % cellSize
+        levelX = (mousePos[0]+offsetX) // cellSize
+        levelY = (mousePos[1]+offsetY) // cellSize
 
-        # checks if the point is in the grid if not dont draw the cursor
-        if self.isPointInGrid(mousePos):
-            # gets the lopleft of the grid square the mouse is in
-            mousePos = self.mapToGrid(mousePos.x, mousePos.y)
-            # reloads and rotates the cursor sprite
-            self.cursor1X1 = pygame.image.load("assets/cursor1X1.png")
-            self.cursor1X1 = pygame.transform.smoothscale(self.cursor1X1, (cellSize*3, cellSize))
-            self.cursor1X1 = pygame.transform.rotate(self.cursor1X1, Placer.rotation)
+        # reloads and rotates the cursor sprite
+        self.cursor1X1 = pygame.image.load("assets/cursor1X1.png")
+        self.cursor1X1 = pygame.transform.smoothscale(self.cursor1X1, (cellSize*3, cellSize))
+        self.cursor1X1 = pygame.transform.rotate(self.cursor1X1, Placer.rotation)
 
-            # positons the cursor depending on the rotaion
-            # when the cursor is rotated 90 or 270 degrees it is moved up
-            # when the cursor is rotated 0 or 180 degrees it is moved left
-            if Placer.rotation % 180 == 0:
-                window.blit(self.cursor1X1, (mousePos.x - cellSize, mousePos.y))
-            else:
-                window.blit(self.cursor1X1, (mousePos.x, mousePos.y - cellSize))
+        # positons the cursor depending on the rotaion
+        # when the cursor is rotated 90 or 270 degrees it is moved up
+        # when the cursor is rotated 0 or 180 degrees it is moved left
+        if Placer.rotation % 180 == 0:
+            window.blit(self.cursor1X1, (levelX*cellSize - cellSize - offsetX, levelY*cellSize - offsetY))
+        else:
+            window.blit(self.cursor1X1, (levelX*cellSize - offsetX, levelY*cellSize - cellSize - offsetY))

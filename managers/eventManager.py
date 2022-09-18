@@ -1,4 +1,4 @@
-from turtle import left
+from turtle import left, width
 import pygame
 import math
 
@@ -6,7 +6,9 @@ from managers.placer import Placer
 from item import Item
 from managers.level import Level
 from managers.renderer import Renderer
+from managers.level import Level
 from buildings.belt import Belt
+from settings import cellSize, screenWidth, screenHeight
 
 class EventManager():
     running = True
@@ -148,3 +150,25 @@ class EventManager():
         # rotation based on belt direction
         if self.checkRotation:
             pass
+
+
+    @classmethod
+    def checkScreenMovement(self, DT):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w]:
+            Renderer.screenPos.y -= DT * Renderer.cameraVel.y
+        if keys[pygame.K_s]:
+            Renderer.screenPos.y += DT * Renderer.cameraVel.y
+        if keys[pygame.K_a]:
+            Renderer.screenPos.x -= DT * Renderer.cameraVel.x
+        if keys[pygame.K_d]:
+            Renderer.screenPos.x += DT * Renderer.cameraVel.x
+
+        if Renderer.screenPos.x < 0:
+            Renderer.screenPos.x = 0
+        if Renderer.screenPos.x > Level.width * cellSize - screenWidth:
+            Renderer.screenPos.x = Level.width * cellSize - screenWidth
+        if Renderer.screenPos.y < 0:
+            Renderer.screenPos.y = 0
+        if Renderer.screenPos.y > Level.height * cellSize - screenHeight:
+            Renderer.screenPos.y = Level.height * cellSize - screenHeight
