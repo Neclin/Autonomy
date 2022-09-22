@@ -22,10 +22,16 @@ class EventManager():
 
     @classmethod
     def checkEvents(self):
+        
+        mousePos = pygame.mouse.get_pos()
+        mousePos = (mousePos[0] + Renderer.screenPos.x, mousePos[1] + Renderer.screenPos.y)
+        levelX = mousePos[0] // cellSize
+        levelY = mousePos[1] // cellSize
+        arrayPos = pygame.Vector2(levelX, levelY)
+
         # get the mouse pos and converts to a vector
         mousePos = pygame.mouse.get_pos()
-        mousePos = pygame.Vector2(mousePos[0], mousePos[1])
-        arrayPos = Placer.getCoord(mousePos.x, mousePos.y)
+        mousePos = pygame.Vector2(mousePos[0], mousePos[1])        
 
         mouseDirectionChanged = False
         arrayPosChanged = False

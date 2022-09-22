@@ -1,4 +1,5 @@
 import pygame
+from buildings.belt import Belt
 
 from settings import cellSize, screenWidth, screenHeight
 from managers.placer import Placer
@@ -15,6 +16,10 @@ class Renderer():
     screenPos = pygame.Vector2(0, 0)
     cameraVel = pygame.Vector2(100, 100)
 
+    @classmethod
+    def init(self):
+        self.screenPos = pygame.Vector2(Level.width * cellSize / 2 - screenWidth / 2, Level.height * cellSize / 2 - screenHeight / 2)
+
     @classmethod # snaps a point to the grid
     def mapToGrid(self, x, y):
         return pygame.Vector2((x - Level.offset.x) // cellSize * cellSize + Level.offset.x, (y - Level.offset.y) // cellSize * cellSize + Level.offset.y)
@@ -29,13 +34,36 @@ class Renderer():
     def update(self, window, dt, animationFrames):
         window.fill((204,204,204)) # fills the background colour
 
-        print(self.screenPos.x, self.screenPos.y)
+        # print(self.screenPos.x, self.screenPos.y)
 
         self.drawGrid(window)
 
+        offsetX = self.screenPos.x % cellSize
+        offsetY = self.screenPos.y % cellSize
+        # draw each square of the grid
+        for y in range(0, screenHeight+cellSize, cellSize):
+            for x in range(0, screenWidth+cellSize, cellSize):
+                levelX = int((x + self.screenPos.x) // cellSize)
+                levelY = int((y + self.screenPos.y) // cellSize)
+                building = Level.array[levelY][levelX]
+                if isinstance(building, Belt):
+                    # building.pos = pygame.Vector2(x - offsetX, y - offsetY)
+                    # building.genPoints()
+                    building.pos = pygame.Vector2(x - offsetX, y - offsetY)
+                    building.show(window, animationFrames["belt"])
+
+        # debugging layer
+        for y in range(0, screenHeight+cellSize, cellSize):
+            for x in range(0, screenWidth+cellSize, cellSize):
+                levelX = int((x + self.screenPos.x) // cellSize)
+                levelY = int((y + self.screenPos.y) // cellSize)
+                building = Level.array[levelY][levelX]
+                if isinstance(building, Belt):
+                    building.debug(window)
+
         # draws all belts
-        for belt in Level.belts:
-            belt.show(Level.offset, window, animationFrames["belt"])
+        # for belt in Level.belts:
+        #     belt.show(Level.offset, window, animationFrames["belt"])
         
         # draws all paths
         for path in Level.paths:
