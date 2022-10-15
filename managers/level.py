@@ -3,7 +3,7 @@ import pygame
 from settings import screenHeight, screenWidth, cellSize
 from GUI.button import Button
 
-class Level():
+class Level:
 
     array = []
     width = 0
@@ -19,23 +19,23 @@ class Level():
     buttonList = ["belt", "forge"]
 
     @classmethod # loads the level from a file
-    def loadLevel(self, directory, Placer):
+    def loadLevel(cls, directory, Placer):
         with open(directory) as f:
             # first line of the file is the dimensions of the level
             dimensions = f.readline().split(',')
-            self.width = int(dimensions[0])
-            self.height = int(dimensions[1])
+            cls.width = int(dimensions[0])
+            cls.height = int(dimensions[1])
             # calculates the offset of the level so it is in the center
-            self.offset = pygame.Vector2(screenWidth/2 - (self.width * cellSize)/2, screenHeight/2 - (Level.height * cellSize)/2)
+            cls.offset = pygame.Vector2(screenWidth / 2 - (cls.width * cellSize) / 2, screenHeight / 2 - (Level.height * cellSize) / 2)
 
             # create an empty array
-            self.array = [[None for x in range(self.width)] for y in range(self.height)]
+            cls.array = [[None for x in range(cls.width)] for y in range(cls.height)]
 
             # creates the buttons for the level
-            for index in range(len(self.buttonList)):
-                offset = (screenWidth - 100 * len(self.buttonList)) // 2
-                button = Button(pygame.Vector2(offset + 100 * index, screenHeight-100), self.buttonList[index])
-                self.buttons.append(button)
+            for index in range(len(cls.buttonList)):
+                offset = (screenWidth - 100 * len(cls.buttonList)) // 2
+                button = Button(pygame.Vector2(offset + 100 * index, screenHeight-100), cls.buttonList[index])
+                cls.buttons.append(button)
 
             # reads each line and uses the first word to determine what to do
             for line in f:
@@ -49,7 +49,7 @@ class Level():
                     Placer.belt.place(int(line[1]), int(line[2]), startDirection, endDirection, int(line[5]))
     
     @classmethod
-    def saveLevel(self, directory):
+    def saveLevel(cls, directory):
         with open(directory, "w") as f:
             f.write(str(Level.width)+","+str(Level.height)+"\n")
             for belt in Level.belts:
