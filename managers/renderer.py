@@ -61,7 +61,7 @@ class Renderer:
                 levelY = int((y + cls.screenPos.y) // cellSize)
                 building = Level.array[levelY][levelX]
                 if isinstance(building, Belt):
-                    building.debug(window)
+                    building.debug(window, cls.screenPos)
 
         # draws all belts
         # for belt in Level.belts:

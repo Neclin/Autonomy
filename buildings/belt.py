@@ -49,7 +49,7 @@ class Belt:
 
         for t in range(1, beltPoints + 1):
             t = t / beltPoints
-            self.points.append(quadraticBezier(t, start, anchor, end))
+            self.points.append(self.pos + quadraticBezier(t, start, anchor, end))
 
         # pointY = self.pos.y + cellSize / 2 # calculates the y coordinate of the middle of the belt
         # pointX = self.pos.x + cellSize / 2 # calculates the x coordinate of the middle of the belt
@@ -148,18 +148,18 @@ class Belt:
         window.blit(self.sprite, self.pos - screenPos)
 
     # Debug function to show the points of the belt
-    def debug(self, window):
+    def debug(self, window, screenPos):
         # print(self.occupied)
         for index in range(len(self.points) - 1):
-            currentPoint = self.pos + self.points[index]
-            nextPoint = self.pos + self.points[index + 1]
+            currentPoint = self.points[index] - screenPos
+            nextPoint = self.points[index + 1] - screenPos
             pygame.draw.line(window, (0, 0, 255), currentPoint, nextPoint, 1)
             pygame.draw.circle(window, (0, 255, 0), currentPoint, 2)
 
-        lastPoint = self.pos + self.points[-1]
+        lastPoint = self.points[-1] - screenPos
         pygame.draw.circle(window, (255, 255, 0), lastPoint, 2)
         if self.next and self.next.points:
-            nextBeltFirstPoint = self.next.pos + self.next.points[0]
+            nextBeltFirstPoint = self.next.points[0] - screenPos
             pygame.draw.line(window, (0, 0, 255), lastPoint, nextBeltFirstPoint, 1)
 
     def setNext(self):
