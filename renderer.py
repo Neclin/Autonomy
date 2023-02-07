@@ -1,7 +1,7 @@
 import pygame
 
 from settings import CELLSIZE, SCREENWIDTH, SCREENHEIGHT
-from modules import snapVectorToGrid, mapVectorToArray
+from modules import snapVectorToGrid, mapVectorToArray, snapVectorToGridNoCamera,  mapVectorToArrayNoCamera
 
 class Renderer():
     def __init__(self, screenWidth, screenHeight, camera=None, caption="Pygame Window"):
@@ -10,7 +10,7 @@ class Renderer():
 
         self.camera = camera
 
-    def updateScreen(self, world):
+    def updateScreen(self, world, eventManager):
         # clears the screen
         self.win.fill((51,51,51))
 
@@ -28,7 +28,23 @@ class Renderer():
             and gameObject.worldPosition.y <= self.camera.worldPosition.y + self.camera.height):
                 gameObject.show(self.win, self.camera)
 
+        self.drawCursor(eventManager)
+
         pygame.display.update()
+
+    def drawCursor(self, eventManager):
+        mousePosition = pygame.mouse.get_pos()
+        cameraOffset = pygame.Vector2(self.camera.worldPosition.x % CELLSIZE, self.camera.worldPosition.y % CELLSIZE)
+        screenMousePosition = pygame.Vector2(mousePosition[0], mousePosition[1]) - self.camera.position + cameraOffset
+
+        snappedWorldMousePosition = snapVectorToGridNoCamera(screenMousePosition) - cameraOffset
+
+        pygame.draw.rect(self.win, (255, 255, 255), (snappedWorldMousePosition.x, snappedWorldMousePosition.y, CELLSIZE, CELLSIZE), 1)
+        
+        middle = snappedWorldMousePosition + pygame.Vector2(CELLSIZE/2, CELLSIZE/2)
+        pygame.draw.line(self.win, (100,100,255), middle, middle - eventManager.startDirection * CELLSIZE/2, 2)
+        pygame.draw.line(self.win, (255,100,100), middle, middle + eventManager.endDirection * CELLSIZE/2, 2)
+
 
 class Camera():
     def __init__(self, x, y, width, height, velocity, world):

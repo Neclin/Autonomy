@@ -1,4 +1,4 @@
-import pygame
+import pygame, math
 
 from settings import CELLSIZE
 
@@ -28,3 +28,11 @@ def mapVectorToArray(vector, camera):
 
 def convertRelativePositionToWorld(relativePosition, camera):
     return relativePosition + camera.worldPosition
+
+def rotateVectorByAngle(Vector, Angle):
+    rotatedVector = pygame.Vector2(round(Vector.x * math.cos(math.radians(Angle)) - Vector.y * math.sin(math.radians(Angle))),
+                                    round(Vector.x * math.sin(math.radians(Angle)) + Vector.y * math.cos(math.radians(Angle))))
+    return rotatedVector
+
+def quadraticBezierCurve(p0, p1, p2, t):
+    return (1 - t)**2 * p0 + 2 * (1 - t) * t * p1 + t**2 * p2

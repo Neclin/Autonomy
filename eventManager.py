@@ -5,7 +5,7 @@ from gameObject import GameObject
 
 from placement import *
 from settings import SCREENWIDTH, SCREENHEIGHT, CELLSIZE, WORLDPIXELWIDTH, WORLDPIXELHEIGHT
-from modules import snapVectorToGrid, mapVectorToArray
+from modules import snapVectorToGrid, mapVectorToArray, rotateVectorByAngle
 
 class EventManager():
     def __init__(self):
@@ -16,7 +16,10 @@ class EventManager():
 
         self.pos1 = None
 
-    def checkEvents(self, world):
+        self.startDirection = pygame.Vector2(1, 0)
+        self.endDirection = pygame.Vector2(1, 0)
+
+    def checkEvents(self, world, camera):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -28,6 +31,28 @@ class EventManager():
                 
                 if event.key == pygame.K_RCTRL:
                     world.save("levels/level1.txt")
+
+                if event.key == pygame.K_r:
+                    self.startDirection = rotateVectorByAngle(self.startDirection, 90)
+                    self.endDirection = rotateVectorByAngle(self.endDirection, 90)
+                
+                if event.key == pygame.K_LEFT:  
+                    self.startDirection = rotateVectorByAngle(self.startDirection, -90)
+                
+                if event.key == pygame.K_RIGHT:
+                    self.startDirection = rotateVectorByAngle(self.startDirection, 90)
+
+                if event.key == pygame.K_UP:
+                    self.endDirection = rotateVectorByAngle(self.endDirection, -90)
+                
+                if event.key == pygame.K_DOWN:
+                    self.endDirection = rotateVectorByAngle(self.endDirection, 90)
+
+                if event.key == pygame.K_b:
+                    mousePosition = pygame.mouse.get_pos()
+                    mousePosition = pygame.Vector2(mousePosition[0], mousePosition[1])
+                    worldMousePosition = camera.worldPosition - camera.position + mousePosition
+                    placeItem(worldMousePosition.x, worldMousePosition.y, world)
 
             # elif event.type == pygame.MOUSEBUTTONDOWN:
             #     mousePosition = pygame.mouse.get_pos()
@@ -81,7 +106,8 @@ class EventManager():
             # print(f"World position x:{worldMousePosition.x}, y:{worldMousePosition.y}")
             # print(f"Snapped world position x:{snappedWorldMousePosition.x}, y:{snappedWorldMousePosition.y}")
             # print(f"Array position x:{arrayMousePosition.x}, y:{arrayMousePosition.y}\n")
-            PlaceGameobject(arrayX, arrayY, snappedWorldMousePosition, world)
+            placeBelt(arrayX, arrayY, snappedWorldMousePosition, world, self.startDirection, self.endDirection)
+            # PlaceGameObject(arrayX, arrayY, snappedWorldMousePosition, world)
         
         if pressedMouseButtons[2]:
             # print("right mouse button pressed")
