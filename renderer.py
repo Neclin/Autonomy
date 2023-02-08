@@ -10,6 +10,8 @@ class Renderer():
 
         self.camera = camera
 
+        self.animationFrame = 0
+
     def updateScreen(self, world, eventManager):
         # clears the screen
         self.win.fill((51,51,51))
@@ -19,14 +21,14 @@ class Renderer():
             pygame.draw.rect(self.win, (0, 0, 0), self.camera.rect, 1)
 
         # draw a grid over the screen
-        self.camera.drawGrid(self.win, world)
+        self.camera.drawGrid(self.win)
 
         for gameObject in world.gameObjects:
             if (gameObject.worldPosition.x + gameObject.width >= self.camera.worldPosition.x 
             and gameObject.worldPosition.x <= self.camera.worldPosition.x + self.camera.width 
             and gameObject.worldPosition.y + gameObject.height >= self.camera.worldPosition.y 
             and gameObject.worldPosition.y <= self.camera.worldPosition.y + self.camera.height):
-                gameObject.show(self.win, self.camera)
+                gameObject.show(self, self.camera)
 
         self.drawCursor(eventManager)
 
@@ -35,15 +37,20 @@ class Renderer():
     def drawCursor(self, eventManager):
         mousePosition = pygame.mouse.get_pos()
         cameraOffset = pygame.Vector2(self.camera.worldPosition.x % CELLSIZE, self.camera.worldPosition.y % CELLSIZE)
-        screenMousePosition = pygame.Vector2(mousePosition[0], mousePosition[1]) - self.camera.position + cameraOffset
+        cameraScreenOffset = pygame.Vector2(self.camera.position.x%CELLSIZE, self.camera.position.y%CELLSIZE)
+        screenMousePosition = pygame.Vector2(mousePosition[0], mousePosition[1]) + cameraOffset
 
-        snappedWorldMousePosition = snapVectorToGridNoCamera(screenMousePosition) - cameraOffset
+        snappedWorldMousePosition = snapVectorToGridNoCamera(screenMousePosition) - cameraOffset + cameraScreenOffset
 
         pygame.draw.rect(self.win, (255, 255, 255), (snappedWorldMousePosition.x, snappedWorldMousePosition.y, CELLSIZE, CELLSIZE), 1)
         
         middle = snappedWorldMousePosition + pygame.Vector2(CELLSIZE/2, CELLSIZE/2)
         pygame.draw.line(self.win, (100,100,255), middle, middle - eventManager.startDirection * CELLSIZE/2, 2)
         pygame.draw.line(self.win, (255,100,100), middle, middle + eventManager.endDirection * CELLSIZE/2, 2)
+
+    def incrementAnimationFrame(self):
+        self.animationFrame += 1
+        self.animationFrame %= 8
 
 
 class Camera():
@@ -69,7 +76,7 @@ class Camera():
         self.worldPosition.x = min(self.worldPosition.x, self.world.width - self.width)
         self.worldPosition.y = min(self.worldPosition.y, self.world.height - self.height)
 
-    def drawGrid(self, win, world):
+    def drawGrid(self, win):
         # the offset for each grid square
         gridOffset = pygame.Vector2(0, 0)
         gridOffset.x = self.worldPosition.x % CELLSIZE
@@ -84,8 +91,7 @@ class Camera():
         for y in range(0, self.height+CELLSIZE, CELLSIZE):
             for x in range(0, self.width+CELLSIZE, CELLSIZE):
                 
-                if world.worldArray[int(arrayOffset.y + y//CELLSIZE)][int(arrayOffset.x + x//CELLSIZE)] == 0:
-                    pygame.draw.rect(win, (0, 0, 0), 
-                    (self.position.x + x - gridOffset.x, 
-                    self.position.y + y - gridOffset.y, 
-                    CELLSIZE, CELLSIZE), 1)
+                pygame.draw.rect(win, (0, 0, 0), 
+                (self.position.x + x - gridOffset.x, 
+                self.position.y + y - gridOffset.y, 
+                CELLSIZE, CELLSIZE), 1)

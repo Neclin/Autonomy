@@ -1,14 +1,32 @@
-import pygame
+import pygame, time
 
 from gameObject import GameObject
 
 from settings import CELLSIZE, POINTSPERBELT
 from modules import mapVectorToArrayNoCamera, quadraticBezierCurve
 
-beltSprites = pygame.image.load("assets/belt.png")
-straightBeltSprite = pygame.Surface.subsurface(beltSprites, (0,0,CELLSIZE,CELLSIZE))
-rightBeltSprite = pygame.Surface.subsurface(beltSprites, (0,CELLSIZE,CELLSIZE,CELLSIZE))
-leftBeltSprite = pygame.Surface.subsurface(beltSprites, (0, CELLSIZE*2,CELLSIZE,CELLSIZE))
+spriteSheet = pygame.image.load("assets/sprites.png")
+straightBeltSpriteSheet = pygame.Surface.subsurface(spriteSheet, (0,0,32*8,32))
+rightBeltSpriteSheet = pygame.Surface.subsurface(spriteSheet, (0,32,32*8,32))
+leftBeltSpriteSheet = pygame.Surface.subsurface(spriteSheet, (0, 32*2,32*8,32))
+
+straightBeltSprites0 = [pygame.Surface.subsurface(straightBeltSpriteSheet, (i*32,0,32,32)) for i in range(8)]
+straightBeltSprites90 = [pygame.transform.rotate(sprite, 90) for sprite in straightBeltSprites0]
+straightBeltSprites180 = [pygame.transform.rotate(sprite, 180) for sprite in straightBeltSprites0]
+straightBeltSpritesN90 = [pygame.transform.rotate(sprite, 270) for sprite in straightBeltSprites0]
+straightBeltSprites = [straightBeltSprites0, straightBeltSprites90, straightBeltSprites180, straightBeltSpritesN90]
+
+rightBeltSprites0 = [pygame.Surface.subsurface(rightBeltSpriteSheet, (i*32,0,32,32)) for i in range(8)]
+rightBeltSprites90 = [pygame.transform.rotate(sprite, 90) for sprite in rightBeltSprites0]
+rightBeltSprites180 = [pygame.transform.rotate(sprite, 180) for sprite in rightBeltSprites0]
+rightBeltSpritesN90 = [pygame.transform.rotate(sprite, 270) for sprite in rightBeltSprites0]
+rightBeltSprites = [rightBeltSprites0, rightBeltSprites90, rightBeltSprites180, rightBeltSpritesN90]
+
+leftBeltSprites0 = [pygame.Surface.subsurface(leftBeltSpriteSheet, (i*32,0,32,32)) for i in range(8)]
+leftBeltSprites90 = [pygame.transform.rotate(sprite, 90) for sprite in leftBeltSprites0]
+leftBeltSprites180 = [pygame.transform.rotate(sprite, 180) for sprite in leftBeltSprites0]
+leftBeltSpritesN90 = [pygame.transform.rotate(sprite, 270) for sprite in leftBeltSprites0]
+leftBeltSprites = [leftBeltSprites0, leftBeltSprites90, leftBeltSprites180, leftBeltSpritesN90]
 
 class Belt(GameObject):
     def __init__(self, x, y, startDirection, endDirection, world):
@@ -22,14 +40,29 @@ class Belt(GameObject):
             self.angle = -90
 
         if self.angle == 0:
-            self.sprite = straightBeltSprite 
+            self.spriteList = straightBeltSprites
         if self.angle == 90:
-            self.sprite = rightBeltSprite
+            self.spriteList = rightBeltSprites
         if self.angle == -90:
-            self.sprite = leftBeltSprite
+            self.spriteList = leftBeltSprites
 
         self.rotation = self.startDirection.angle_to(pygame.Vector2(1, 0))
-        self.sprite = pygame.transform.rotate(self.sprite, self.rotation)
+        if self.rotation == -270:
+            self.rotation = 90
+        if self.rotation == 270:
+            self.rotation = -90
+        if self.rotation == -180:
+            self.rotation = 180
+
+        if self.spriteList:
+            if self.rotation == 0:
+                self.spriteList = self.spriteList[0]
+            if self.rotation == 90:
+                self.spriteList = self.spriteList[1]
+            if self.rotation == 180:
+                self.spriteList = self.spriteList[2]
+            if self.rotation == -90:
+                self.spriteList = self.spriteList[3]
 
         self.next = None
         self.previous = None
@@ -40,16 +73,16 @@ class Belt(GameObject):
         self.generatePoints()
 
 
-    def show(self, win, camera):
-        super().show(win, camera)
+    def show(self, renderer, camera):
+        super().show(renderer, camera)
         middle = self.worldPosition + pygame.Vector2(CELLSIZE/2, CELLSIZE/2)
         screenMiddle = camera.position + middle - camera.worldPosition
         # pygame.draw.line(win, (0,0,255), screenMiddle, screenMiddle - self.startDirection * CELLSIZE/2, 2)
         # pygame.draw.line(win, (255,0,0), screenMiddle, screenMiddle + self.endDirection * CELLSIZE/2, 2)
-        for point in self.points:
-            if point:
-                screenPoint = camera.position + point - camera.worldPosition
-                pygame.draw.circle(win, (255,0,255), screenPoint, 1)
+        # for point in self.points:
+        #     if point:
+        #         screenPoint = camera.position + point - camera.worldPosition
+        #         pygame.draw.circle(renderer.win, (255,0,255), screenPoint, 1)
 
     def getNeighbours(self, world):
         nextPosition = self.worldPosition + self.endDirection * CELLSIZE

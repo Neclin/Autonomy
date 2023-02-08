@@ -11,7 +11,8 @@ class EventManager():
     def __init__(self):
         self.running = True
 
-        self.oldTime = time.time()
+        self.lastFrameTime = time.time()
+        self.lastAnimationFrameTime = time.time()
         self.deltaTime = 0
 
         self.pos1 = None

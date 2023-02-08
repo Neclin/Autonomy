@@ -42,10 +42,17 @@ while eventManager.running:
     eventManager.checkMousePress(camera, world)
 
     # runs only when the screen should update
-    if newTime - eventManager.oldTime >= 1/FPS:
-        eventManager.deltaTime = newTime - eventManager.oldTime
-        eventManager.oldTime = newTime
+    if newTime - eventManager.lastFrameTime >= 1/FPS:
+        eventManager.deltaTime = newTime - eventManager.lastFrameTime
+        eventManager.lastFrameTime = newTime
 
         eventManager.checkCameraMovement(camera)
 
         renderer.updateScreen(world, eventManager)
+
+    # runs when the game needs to increment the animation frame
+    if newTime - eventManager.lastAnimationFrameTime >= 1/ANIMATIONFPS:
+        renderer.incrementAnimationFrame()
+        eventManager.lastAnimationFrameTime = newTime
+    
+    

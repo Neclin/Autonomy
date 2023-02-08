@@ -12,5 +12,5 @@ class Item(GameObject):
     def getNextPoint():
         pass
 
-    def show(self, win, camera):
-        super().show(win, camera)
+    def show(self, renderer, camera):
+        super().show(renderer, camera)
