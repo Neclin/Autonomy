@@ -1,7 +1,7 @@
 import pygame
 
 from settings import CELLSIZE, SCREENWIDTH, SCREENHEIGHT
-from modules import snapVectorToGrid, mapVectorToArray, snapVectorToGridNoCamera,  mapVectorToArrayNoCamera
+from modules import *
 
 class Renderer():
     def __init__(self, screenWidth, screenHeight, camera=None, caption="Pygame Window"):
@@ -31,22 +31,29 @@ class Renderer():
                 gameObject.show(self, self.camera)
 
         self.drawCursor(eventManager)
+        self.drawBeltsPath(eventManager)
 
         pygame.display.update()
 
     def drawCursor(self, eventManager):
-        mousePosition = pygame.mouse.get_pos()
-        cameraOffset = pygame.Vector2(self.camera.worldPosition.x % CELLSIZE, self.camera.worldPosition.y % CELLSIZE)
-        cameraScreenOffset = pygame.Vector2(self.camera.position.x%CELLSIZE, self.camera.position.y%CELLSIZE)
-        screenMousePosition = pygame.Vector2(mousePosition[0], mousePosition[1]) + cameraOffset
+        snappedScreenMousePosition = convertWorldToScreenPosition(eventManager.snappedWorldMousePosition, self.camera)
+        middle = snappedScreenMousePosition + pygame.Vector2(CELLSIZE/2, CELLSIZE/2)
 
-        snappedWorldMousePosition = snapVectorToGridNoCamera(screenMousePosition) - cameraOffset + cameraScreenOffset
-
-        pygame.draw.rect(self.win, (255, 255, 255), (snappedWorldMousePosition.x, snappedWorldMousePosition.y, CELLSIZE, CELLSIZE), 1)
-        
-        middle = snappedWorldMousePosition + pygame.Vector2(CELLSIZE/2, CELLSIZE/2)
+        pygame.draw.rect(self.win, (255, 255, 255), (snappedScreenMousePosition.x, snappedScreenMousePosition.y, CELLSIZE, CELLSIZE), 1)
         pygame.draw.line(self.win, (100,100,255), middle, middle - eventManager.startDirection * CELLSIZE/2, 2)
         pygame.draw.line(self.win, (255,100,100), middle, middle + eventManager.endDirection * CELLSIZE/2, 2)
+
+    def drawBeltsPath(self, eventManager):
+        if eventManager.position1:
+            snappedScreenMousePosition = convertWorldToScreenPosition(eventManager.snappedWorldMousePosition, self.camera)
+            screenPosition1 = convertWorldToScreenPosition(eventManager.position1, self.camera)
+            if abs(eventManager.startDirection.x) == 1:
+                anchor = pygame.Vector2(screenPosition1.x, snappedScreenMousePosition.y)
+            else:
+                anchor = pygame.Vector2(snappedScreenMousePosition.x, screenPosition1.y)
+            halfCellSize = pygame.Vector2(CELLSIZE/2, CELLSIZE/2)
+            pygame.draw.line(self.win, (255,255,0), screenPosition1+halfCellSize, anchor+halfCellSize)
+            pygame.draw.line(self.win, (255,255,0), anchor+halfCellSize, snappedScreenMousePosition+halfCellSize)
 
     def incrementAnimationFrame(self):
         self.animationFrame += 1

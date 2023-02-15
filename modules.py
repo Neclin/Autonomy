@@ -29,6 +29,9 @@ def mapVectorToArray(vector, camera):
 def convertRelativePositionToWorld(relativePosition, camera):
     return relativePosition + camera.worldPosition
 
+def convertWorldToScreenPosition(worldPosition, camera):
+    return worldPosition - camera.worldPosition + camera.position
+
 def rotateVectorByAngle(Vector, Angle):
     rotatedVector = pygame.Vector2(round(Vector.x * math.cos(math.radians(Angle)) - Vector.y * math.sin(math.radians(Angle))),
                                     round(Vector.x * math.sin(math.radians(Angle)) + Vector.y * math.cos(math.radians(Angle))))
