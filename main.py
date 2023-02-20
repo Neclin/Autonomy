@@ -48,11 +48,12 @@ while eventManager.running:
 
         eventManager.checkCameraMovement(camera)
 
+        for gameObject in world.gameObjects:
+            gameObject.update(eventManager.deltaTime)
         renderer.updateScreen(world, eventManager)
 
     # runs when the game needs to increment the animation frame
     if newTime - eventManager.lastAnimationFrameTime >= 1/ANIMATIONFPS:
         renderer.incrementAnimationFrame()
         eventManager.lastAnimationFrameTime = newTime
-    
     

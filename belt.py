@@ -31,6 +31,9 @@ leftBeltSprites = [leftBeltSprites0, leftBeltSprites90, leftBeltSprites180, left
 class Belt(GameObject):
     def __init__(self, x, y, startDirection, endDirection, world):
         super().__init__(x, y, CELLSIZE, CELLSIZE, type="Belt")
+
+        self.layer = 1
+
         self.startDirection = startDirection
         self.endDirection = endDirection
         self.angle = int(startDirection.angle_to(endDirection))
@@ -84,6 +87,9 @@ class Belt(GameObject):
         #         screenPoint = camera.position + point - camera.worldPosition
         #         pygame.draw.circle(renderer.win, (255,0,255), screenPoint, 1)
 
+        # if self.occupied != [None for i in range(POINTSPERBELT)]:
+        #     print(self.occupied)
+
     def getNeighbours(self, world):
         nextPosition = self.worldPosition + self.endDirection * CELLSIZE
         previousPosition = self.worldPosition - self.startDirection * CELLSIZE
@@ -92,9 +98,11 @@ class Belt(GameObject):
 
         if world.worldArray[int(nextArrayPosition.y)][int(nextArrayPosition.x)] != 0:
             self.next = world.worldArray[int(nextArrayPosition.y)][int(nextArrayPosition.x)]
+            self.next.previous = self
         
         if world.worldArray[int(previousArrayPosition.y)][int(previousArrayPosition.x)] != 0:
             self.previous = world.worldArray[int(previousArrayPosition.y)][int(previousArrayPosition.x)]
+            self.previous.next = self
 
     def generatePoints(self):
         anchor = self.worldPosition + pygame.Vector2(CELLSIZE//2, CELLSIZE//2)

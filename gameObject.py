@@ -5,6 +5,8 @@ class GameObject():
                  colour=(255, 255, 255),
                  spriteList=None, type="GameObject"):
 
+        self.layer = 0
+
         self.worldPosition = pygame.Vector2(x, y)
         self.width = width
         self.height = height
@@ -27,3 +29,5 @@ class GameObject():
                                     self.width, self.height)
             pygame.draw.rect(renderer.win, self.colour, self.rect)
     
+    def update(self, deltaTime):
+        pass

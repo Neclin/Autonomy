@@ -10,7 +10,7 @@ def PlaceGameObject(arrayX, arrayY, position, world):
     if world.worldArray[arrayY][arrayX] == 0:
         newGameObject = GameObject(position.x, position.y, CELLSIZE, CELLSIZE, (0,255,0), type="GameObject")
         world.worldArray[arrayY][arrayX] = newGameObject
-        world.gameObjects.append(newGameObject)
+        insertGameObjects(newGameObject, world)
 
 def removeGameObject(arrayX, arrayY, world):
     arrayX, arrayY = int(arrayX), int(arrayY)
@@ -34,7 +34,7 @@ def placeBelt(arrayX, arrayY, position, world, startDirection, endDirection):
     if world.worldArray[arrayY][arrayX] == 0:
         newBelt = Belt(position.x, position.y, startDirection, endDirection, world)
         world.worldArray[arrayY][arrayX] = newBelt
-        world.gameObjects.append(newBelt)
+        insertGameObjects(newBelt, world)
 
         if newBelt.previous != None:
             newBelt.previous.next = newBelt
@@ -60,5 +60,19 @@ def placeBeltPath(start, end, world):
     return directionVector
 
 def placeItem(x, y, world):
+    firstBelt = None
+    for gameObject in world.gameObjects:
+        if gameObject.type == "Belt":
+            firstBelt = gameObject
+            break
     newItem = Item(x, y, 4, 4)
-    world.gameObjects.append(newItem)
+    newItem.belt = firstBelt
+    insertGameObjects(newItem, world)
+    newItem.setNextPoint()
+
+def insertGameObjects(gameObjectToInsert, world):
+    for i, gameObject in enumerate(world.gameObjects):
+        if gameObject.layer >= gameObjectToInsert.layer:
+            world.gameObjects.insert(i, gameObjectToInsert)
+            return
+    world.gameObjects.append(gameObjectToInsert)
