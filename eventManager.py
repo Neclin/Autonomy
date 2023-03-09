@@ -130,7 +130,7 @@ class EventManager():
             # print(f"Snapped world position x:{snappedWorldMousePosition.x}, y:{snappedWorldMousePosition.y}")
             # print(f"Array position x:{arrayMousePosition.x}, y:{arrayMousePosition.y}\n")
             placeBelt(arrayX, arrayY, self.snappedWorldMousePosition, world, self.startDirection, self.endDirection)
-            # PlaceGameObject(arrayX, arrayY, snappedWorldMousePosition, world)
+            # PlaceGameObject(arrayX, arrayY, snappedWorldMousePosition, world) 
         
         if pressedMouseButtons[2]:
             # print("right mouse button pressed")

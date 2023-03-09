@@ -9,6 +9,8 @@ from gameObject import GameObject
 from belt import Belt
 from item import Item
 
+from GUI import loadMainMenu
+
 # # 0 degree belts
 # testBelt = Belt(10, 10, pygame.Vector2(1, 0), pygame.Vector2(1, 0))
 # testBelt = Belt(10, 10, pygame.Vector2(0, 1), pygame.Vector2(0, 1))
@@ -33,7 +35,8 @@ renderer = Renderer(SCREENWIDTH, SCREENHEIGHT, camera=camera, caption="Autonomy"
 eventManager = EventManager()
 
 world = World(WORLDWIDTH, WORLDHEIGHT)
-world.load("levels/level1.txt")
+#world.load("levels/level1.txt")
+loadMainMenu(world)
 
 while eventManager.running:
     newTime = time.time()
@@ -48,8 +51,7 @@ while eventManager.running:
 
         eventManager.checkCameraMovement(camera)
 
-        for gameObject in world.gameObjects:
-            gameObject.update(eventManager.deltaTime)
+        world.updateWorld(eventManager.deltaTime)
         renderer.updateScreen(world, eventManager)
 
     # runs when the game needs to increment the animation frame

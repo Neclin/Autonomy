@@ -21,16 +21,22 @@ class Renderer():
             pygame.draw.rect(self.win, (0, 0, 0), self.camera.rect, 1)
 
         # draw a grid over the screen
-        self.camera.drawGrid(self.win)
+        if world.state == "Level":
+            self.camera.drawGrid(self.win)
 
         for gameObject in world.gameObjects:
+            if gameObject.screenPinned:
+                gameObject.show(self, self.camera)
+                continue
+
             if (gameObject.worldPosition.x + gameObject.width >= self.camera.worldPosition.x 
             and gameObject.worldPosition.x <= self.camera.worldPosition.x + self.camera.width 
             and gameObject.worldPosition.y + gameObject.height >= self.camera.worldPosition.y 
             and gameObject.worldPosition.y <= self.camera.worldPosition.y + self.camera.height):
                 gameObject.show(self, self.camera)
 
-        self.drawCursor(eventManager)
+        if world.state == "Level":
+            self.drawCursor(eventManager)
         self.drawBeltsPath(eventManager)
 
         pygame.display.update()

@@ -19,7 +19,7 @@ class Item(GameObject):
 
         self.overflowMovement = 0
 
-        self.speed = 300
+        self.speed = 100
 
     def update(self, deltaTime):
         if self.belt:

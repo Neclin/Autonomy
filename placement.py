@@ -68,7 +68,6 @@ def placeItem(x, y, world):
     newItem = Item(x, y, 4, 4)
     newItem.belt = firstBelt
     insertGameObjects(newItem, world)
-    newItem.setNextPoint()
 
 def insertGameObjects(gameObjectToInsert, world):
     for i, gameObject in enumerate(world.gameObjects):

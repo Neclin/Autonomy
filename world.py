@@ -12,6 +12,8 @@ class World:
         self.worldArray = [[0 for x in range(width)] for y in range(height)]
 
         self.gameObjects = []
+        
+        self.state = "MainMenu"
 
     def load(self, directory):
         with open(directory, "r") as file:
@@ -48,3 +50,7 @@ class World:
                     file.write(f"Item {int(gameObject.worldPosition.x)} {int(gameObject.worldPosition.y)}\n")
 
         print("Saved! in " + str(time.time() - startTime) + " seconds")
+
+    def updateWorld(self, deltaTime):
+        for gameObject in self.gameObjects:
+            gameObject.update(deltaTime)
