@@ -1,4 +1,0 @@
-GameObject 448 288 14 9
-GameObject 416 288 13 9
-GameObject 384 288 12 9
-GameObject 352 288 11 9

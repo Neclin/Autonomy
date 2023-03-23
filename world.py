@@ -12,10 +12,15 @@ class World:
         self.worldArray = [[0 for x in range(width)] for y in range(height)]
 
         self.gameObjects = []
+        self.containers = []
         
         self.state = "MainMenu"
 
     def load(self, directory):
+        self.state = "Level"
+        for gameObject in self.gameObjects:
+            self.removeGameObject(gameObject)
+        self.containers = []
         with open(directory, "r") as file:
             for line in file:
                 gameObjectData = line.split(" ")

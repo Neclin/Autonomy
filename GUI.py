@@ -8,17 +8,23 @@ def loadMainMenu(world):
     for gameObject in world.gameObjects:
         world.removeGameObject(gameObject)
 
-    container = Container(50, 50, SCREENWIDTH-100, SCREENHEIGHT-100, (51,51,51), (31,31,31))
-    insertGameObjects(container, world)
+    rootContainer = Container(50, 50, SCREENWIDTH-100, SCREENHEIGHT-100, (51,51,51), (31,31,31))
+    insertGameObjects(rootContainer, world)
+    world.containers.append(rootContainer)
 
+    titleHeight = 100
     width = 200
     height = 350
     x = (SCREENWIDTH-width)//2
-    y = (SCREENHEIGHT-height)//2
-    centralContainer = Container(x, y, width, height, (51,51,51))
-    container.addChild(centralContainer)
+    y = (SCREENHEIGHT-height-titleHeight)//2
+    centralContainer = Container(x, y+titleHeight, width, height, (51,51,51))
+    rootContainer.addChild(centralContainer)
+
+    title = GameObject(50, 50, SCREENWIDTH-100, titleHeight, (51,51,51), (31,31,31), text="Autonomy")
+    rootContainer.addChild(title)
 
     playButton = Button(0, 0, 0, 0, (51,51,51), (31,31,31), text="play")
+    playButton.onClick = lambda: world.load("levels/level1.txt")
     leaderboardButton = Button(0, 0, 0, 0, (51,51,51), (31,31,31), text="leaderboard")
     settingsButton = Button(0, 0, 0, 0, (51,51,51), (31,31,31), text="settings")
     quitButton = Button(0, 0, 0, 0, (51,51,51), (31,31,31), text="quit")
@@ -28,6 +34,16 @@ def loadMainMenu(world):
     centralContainer.addChild(settingsButton)
     centralContainer.addChild(quitButton)
     centralContainer.sortVertical(10)
+
+def loadLevelSelect(world):
+    world.state = "LevelSelect"
+    for gameObject in world.gameObjects:
+        world.removeGameObject(gameObject)
+
+    rootContainer = Container(50, 50, SCREENWIDTH-100, SCREENHEIGHT-100, (51,51,51), (31,31,31))
+    insertGameObjects(rootContainer, world)
+    world.containers.append(rootContainer)
+
 
 class Container(GameObject):
     def __init__(self, x, y, width, height, colour, borderColour=None):
@@ -70,6 +86,13 @@ class Container(GameObject):
         for child in self.children:
             child.show(renderer, camera)
 
+    def checkMousePresses(self, mousePos):
+        for child in self.children:
+            if type(child) == Container:
+                child.checkMousePresses(mousePos)
+            else:
+                child.checkPressed(mousePos)
+
 
 class Button(GameObject):
     def __init__(self, x, y, width, height, colour, borderColour=None, onClick=None, text=""):
@@ -77,3 +100,8 @@ class Button(GameObject):
         self.onClick = onClick
         self.layer = 10
         self.screenPinned = True
+
+    def checkPressed(self, mousePos):
+        if self.rect.collidepoint(mousePos):
+            if self.onClick:
+                self.onClick()

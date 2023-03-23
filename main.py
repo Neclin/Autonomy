@@ -11,6 +11,8 @@ from item import Item
 
 from GUI import loadMainMenu
 
+pygame.init()
+
 # # 0 degree belts
 # testBelt = Belt(10, 10, pygame.Vector2(1, 0), pygame.Vector2(1, 0))
 # testBelt = Belt(10, 10, pygame.Vector2(0, 1), pygame.Vector2(0, 1))
@@ -30,12 +32,11 @@ from GUI import loadMainMenu
 # testBelt = Belt(10, 10, pygame.Vector2(1, 0), pygame.Vector2(0, -1))
 # testBelt = Belt(10, 10, pygame.Vector2(-1, 0), pygame.Vector2(0, 1))
 
-camera = Camera(0, 0, 800, 800, 350, None)
+camera = Camera(0, 0, SCREENWIDTH, SCREENHEIGHT, 350, None)
 renderer = Renderer(SCREENWIDTH, SCREENHEIGHT, camera=camera, caption="Autonomy")
 eventManager = EventManager()
 
 world = World(WORLDWIDTH, WORLDHEIGHT)
-#world.load("levels/level1.txt")
 loadMainMenu(world)
 
 while eventManager.running:

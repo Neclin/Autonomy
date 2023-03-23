@@ -63,7 +63,12 @@ class EventManager():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 heldKeys = pygame.key.get_pressed()
                 if event.button == 1:
-                    if heldKeys[pygame.K_LSHIFT]:
+                    # checks for mouse presses on GUI elements stored in the worlds container class
+                    for container in world.containers:
+                        container.checkMousePresses(event.pos)
+
+                    # checks for the alternate placement of belts
+                    if heldKeys[pygame.K_LSHIFT] and world.state == "Level":
                         if self.position1 is None:
                             self.position1 = self.snappedWorldMousePosition
                         else:
@@ -80,6 +85,7 @@ class EventManager():
                                 placeBelt(anchorArray.x, anchorArray.y, anchor, world, startDirection, endDirection)
                             self.position1 = None
                         return
+
 
 
     def checkCameraMovement(self, camera):
@@ -129,7 +135,8 @@ class EventManager():
             # print(f"World position x:{worldMousePosition.x}, y:{worldMousePosition.y}")
             # print(f"Snapped world position x:{snappedWorldMousePosition.x}, y:{snappedWorldMousePosition.y}")
             # print(f"Array position x:{arrayMousePosition.x}, y:{arrayMousePosition.y}\n")
-            placeBelt(arrayX, arrayY, self.snappedWorldMousePosition, world, self.startDirection, self.endDirection)
+            if world.state == "Level":
+                placeBelt(arrayX, arrayY, self.snappedWorldMousePosition, world, self.startDirection, self.endDirection)
             # PlaceGameObject(arrayX, arrayY, snappedWorldMousePosition, world) 
         
         if pressedMouseButtons[2]:

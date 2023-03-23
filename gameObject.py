@@ -1,5 +1,8 @@
 import pygame
 
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 32)
+
 class GameObject():
     def __init__(self, x, y, width, height, 
                  colour=(255, 255, 255), borderColour=None,
@@ -22,7 +25,6 @@ class GameObject():
         self.type = type
 
         self.text = text
-        self.font = pygame.font.SysFont("Arial", 32)
 
         self.screenPinned = False
 
@@ -44,10 +46,16 @@ class GameObject():
                 pygame.draw.rect(renderer.win, self.borderColour, self.rect, 2)
 
             if self.text:
-                text = self.font.render(self.text, True, (0, 0, 0))
+                text = font.render(self.text, True, (0, 0, 0))
                 textRect = text.get_rect()
                 textRect.center = self.rect.center
                 renderer.win.blit(text, textRect)
     
     def update(self, deltaTime):
         pass
+    
+    def checkPressed(self, mousePos):
+        if self.rect.collidepoint(mousePos):
+            print("test")
+            return True
+        return False
