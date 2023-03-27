@@ -4,7 +4,7 @@ import time
 from gameObject import GameObject
 
 from placement import *
-from settings import SCREENWIDTH, SCREENHEIGHT, CELLSIZE, WORLDPIXELWIDTH, WORLDPIXELHEIGHT
+from settings import CELLSIZE, WORLDPIXELWIDTH, WORLDPIXELHEIGHT, MOVEUP, MOVEDOWN, MOVELEFT, MOVERIGHT, ROTATE
 from modules import *
 
 class EventManager():
@@ -25,20 +25,23 @@ class EventManager():
         self.snappedWorldMousePosition = None
         self.arrayMousePosition = None
 
-    def checkEvents(self, world, camera):
+        self.timeSinceStart = 0
+
+    def checkEvents(self, world, camera):   
+        if self.timeSinceStart < 0.1:
+            return
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                self.eventKill()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    quit()
+                    self.eventKill()
                 
                 if event.key == pygame.K_RCTRL:
-                    world.save("levels/level1.txt")
+                    world.save()
 
-                if event.key == pygame.K_r:
+                if event.key == ROTATE:
                     self.startDirection = rotateVectorByAngle(self.startDirection, 90)
                     self.endDirection = rotateVectorByAngle(self.endDirection, 90)
                 
@@ -89,15 +92,18 @@ class EventManager():
 
 
     def checkCameraMovement(self, camera):
+        if self.timeSinceStart < 0.1:
+            return
+        
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_w]:
+        if keys[MOVEUP]:
             camera.worldPosition.y -= camera.velocity * self.deltaTime
-        if keys[pygame.K_s]:
+        if keys[MOVEDOWN]:
             camera.worldPosition.y += camera.velocity * self.deltaTime
-        if keys[pygame.K_a]:
+        if keys[MOVELEFT]:
             camera.worldPosition.x -= camera.velocity * self.deltaTime
-        if keys[pygame.K_d]:
+        if keys[MOVERIGHT]:
             camera.worldPosition.x += camera.velocity * self.deltaTime
 
         camera.worldPosition.x = max(0, camera.worldPosition.x)
@@ -107,6 +113,9 @@ class EventManager():
         camera.worldPosition.y = min(camera.worldPosition.y, WORLDPIXELHEIGHT - camera.height - CELLSIZE)
 
     def checkMousePress(self, camera, world):
+        if self.timeSinceStart < 0.1:
+            return
+
         pressedMouseButtons = pygame.mouse.get_pressed()
         heldKeys = pygame.key.get_pressed()
 
@@ -143,4 +152,7 @@ class EventManager():
             # print("right mouse button pressed")
             removeGameObject(arrayX, arrayY, world)
 
-
+    def eventKill(self):
+        self.running = False
+        pygame.quit()
+        quit()

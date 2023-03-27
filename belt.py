@@ -2,31 +2,48 @@ import pygame, time
 
 from gameObject import GameObject
 
-from settings import CELLSIZE, POINTSPERBELT
+from settings import CELLSIZE, POINTSPERBELT, CELLSIZE
 from modules import mapVectorToArrayNoCamera, quadraticBezierCurve
 
-spriteSheet = pygame.image.load("assets/sprites.png")
-straightBeltSpriteSheet = pygame.Surface.subsurface(spriteSheet, (0,0,32*8,32))
-rightBeltSpriteSheet = pygame.Surface.subsurface(spriteSheet, (0,32,32*8,32))
-leftBeltSpriteSheet = pygame.Surface.subsurface(spriteSheet, (0, 32*2,32*8,32))
+leftBeltSprites = []
+rightBeltSprites = []
+straightBeltSprites = []
 
-straightBeltSprites0 = [pygame.Surface.subsurface(straightBeltSpriteSheet, (i*32,0,32,32)) for i in range(8)]
-straightBeltSprites90 = [pygame.transform.rotate(sprite, 90) for sprite in straightBeltSprites0]
-straightBeltSprites180 = [pygame.transform.rotate(sprite, 180) for sprite in straightBeltSprites0]
-straightBeltSpritesN90 = [pygame.transform.rotate(sprite, 270) for sprite in straightBeltSprites0]
-straightBeltSprites = [straightBeltSprites0, straightBeltSprites90, straightBeltSprites180, straightBeltSpritesN90]
+def bakeBeltSpriteSheet():
+    global leftBeltSprites, rightBeltSprites, straightBeltSprites
+    spriteSheet = pygame.image.load("assets/sprites.png")
+    straightBeltSpriteSheet = pygame.Surface.subsurface(spriteSheet, (0,0,32*8,32))
+    rightBeltSpriteSheet = pygame.Surface.subsurface(spriteSheet, (0,32,32*8,32))
+    leftBeltSpriteSheet = pygame.Surface.subsurface(spriteSheet, (0, 32*2,32*8,32))
 
-rightBeltSprites0 = [pygame.Surface.subsurface(rightBeltSpriteSheet, (i*32,0,32,32)) for i in range(8)]
-rightBeltSprites90 = [pygame.transform.rotate(sprite, 90) for sprite in rightBeltSprites0]
-rightBeltSprites180 = [pygame.transform.rotate(sprite, 180) for sprite in rightBeltSprites0]
-rightBeltSpritesN90 = [pygame.transform.rotate(sprite, 270) for sprite in rightBeltSprites0]
-rightBeltSprites = [rightBeltSprites0, rightBeltSprites90, rightBeltSprites180, rightBeltSpritesN90]
+    straightBeltSprites0 = [pygame.Surface.subsurface(straightBeltSpriteSheet, (i*32,0,32,32)) for i in range(8)]
+    straightBeltSprites90 = [pygame.transform.rotate(sprite, 90) for sprite in straightBeltSprites0]
+    straightBeltSprites180 = [pygame.transform.rotate(sprite, 180) for sprite in straightBeltSprites0]
+    straightBeltSpritesN90 = [pygame.transform.rotate(sprite, 270) for sprite in straightBeltSprites0]
+    straightBeltSprites = [straightBeltSprites0, straightBeltSprites90, straightBeltSprites180, straightBeltSpritesN90]
 
-leftBeltSprites0 = [pygame.Surface.subsurface(leftBeltSpriteSheet, (i*32,0,32,32)) for i in range(8)]
-leftBeltSprites90 = [pygame.transform.rotate(sprite, 90) for sprite in leftBeltSprites0]
-leftBeltSprites180 = [pygame.transform.rotate(sprite, 180) for sprite in leftBeltSprites0]
-leftBeltSpritesN90 = [pygame.transform.rotate(sprite, 270) for sprite in leftBeltSprites0]
-leftBeltSprites = [leftBeltSprites0, leftBeltSprites90, leftBeltSprites180, leftBeltSpritesN90]
+    rightBeltSprites0 = [pygame.Surface.subsurface(rightBeltSpriteSheet, (i*32,0,32,32)) for i in range(8)]
+    rightBeltSprites90 = [pygame.transform.rotate(sprite, 90) for sprite in rightBeltSprites0]
+    rightBeltSprites180 = [pygame.transform.rotate(sprite, 180) for sprite in rightBeltSprites0]
+    rightBeltSpritesN90 = [pygame.transform.rotate(sprite, 270) for sprite in rightBeltSprites0]
+    rightBeltSprites = [rightBeltSprites0, rightBeltSprites90, rightBeltSprites180, rightBeltSpritesN90]
+
+    leftBeltSprites0 = [pygame.Surface.subsurface(leftBeltSpriteSheet, (i*32,0,32,32)) for i in range(8)]
+    leftBeltSprites90 = [pygame.transform.rotate(sprite, 90) for sprite in leftBeltSprites0]
+    leftBeltSprites180 = [pygame.transform.rotate(sprite, 180) for sprite in leftBeltSprites0]
+    leftBeltSpritesN90 = [pygame.transform.rotate(sprite, 270) for sprite in leftBeltSprites0]
+    leftBeltSprites = [leftBeltSprites0, leftBeltSprites90, leftBeltSprites180, leftBeltSpritesN90]
+
+    scaleBeltSprites(straightBeltSprites)
+    scaleBeltSprites(rightBeltSprites)
+    scaleBeltSprites(leftBeltSprites)
+
+def scaleBeltSprites(spriteLists):
+    for list in spriteLists:
+        for i in range(len(list)):
+            list[i] = pygame.transform.scale(list[i], (CELLSIZE, CELLSIZE))
+
+bakeBeltSpriteSheet()
 
 class Belt(GameObject):
     def __init__(self, x, y, startDirection, endDirection, world):

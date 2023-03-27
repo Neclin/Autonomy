@@ -9,7 +9,7 @@ from gameObject import GameObject
 from belt import Belt
 from item import Item
 
-from GUI import loadMainMenu
+from GUI import loadMainMenu, loadLevelSelect, loadSettings
 
 pygame.init()
 
@@ -37,7 +37,7 @@ renderer = Renderer(SCREENWIDTH, SCREENHEIGHT, camera=camera, caption="Autonomy"
 eventManager = EventManager()
 
 world = World(WORLDWIDTH, WORLDHEIGHT)
-loadMainMenu(world)
+loadMainMenu(world, eventManager)
 
 while eventManager.running:
     newTime = time.time()
@@ -49,6 +49,7 @@ while eventManager.running:
     if newTime - eventManager.lastFrameTime >= 1/FPS:
         eventManager.deltaTime = newTime - eventManager.lastFrameTime
         eventManager.lastFrameTime = newTime
+        eventManager.timeSinceStart += eventManager.deltaTime
 
         eventManager.checkCameraMovement(camera)
 

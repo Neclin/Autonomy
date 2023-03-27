@@ -56,6 +56,5 @@ class GameObject():
     
     def checkPressed(self, mousePos):
         if self.rect.collidepoint(mousePos):
-            print("test")
             return True
         return False
